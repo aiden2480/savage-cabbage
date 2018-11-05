@@ -31,7 +31,8 @@ async def on_ready():
   print("\n\n{0}\n| Discord.py up, Server started |\n| I'm in as {1} |\n{0}\n| HTTP Requests,data and errors |\n{0}\n\n".format('|'+('='*31)+'|',client.user))
 
   await client.change_presence(game=discord.Game(name=
-    "$help |~| Insulting {} users across {} servers |~| {}"
+    #"$help |~| Insulting {} users across {} servers |~| {}"
+		"Rebooting on github"
     .format(total_users,len(client.servers),random.choice(roasts_no_bold))))
 
 # Events #
