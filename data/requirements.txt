@@ -1,0 +1,7 @@
+flask
+gspread
+aiohttp
+asyncio
+discord.py
+websockets
+0auth2client
