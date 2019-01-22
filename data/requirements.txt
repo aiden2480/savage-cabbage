@@ -1,7 +1,5 @@
 flask
-gspread
 aiohttp
 asyncio
-discord.py
+discord
 websockets
-0auth2client
