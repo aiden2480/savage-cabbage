@@ -23,6 +23,8 @@ async def on_ready():
 
 @client.event
 async def on_message(m):
+    blacklisted = []
+
     if m.author.bot or m.author in blacklisted: return
     devs = await message_setup(m)
 
