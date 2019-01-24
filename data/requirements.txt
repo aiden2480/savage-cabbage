@@ -1,5 +1,0 @@
-flask
-aiohttp
-asyncio
-discord
-websockets
