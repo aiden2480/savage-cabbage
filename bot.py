@@ -28,7 +28,7 @@ async def on_ready():
     \n""")
 
     await client.change_presence(game=discord.Game(name=
-        f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
+        "with knives"#f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
     ))
 
 @client.event
