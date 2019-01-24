@@ -5,7 +5,7 @@ client = discord.Client()
 
 async def send():
     pass
-
+print('connected!')
 # Once setup finished, event #
 @client.event
 async def on_ready():
@@ -35,6 +35,9 @@ async def on_ready():
 async def on_message(m):
     if m.author.bot or m.author in blacklisted: return
     devs = await message_setup(m)
+
+    if m.author in devs and m.content == ".hi":
+        await client.send_message(m.channel, "yeet")
 
 
 
