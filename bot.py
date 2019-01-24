@@ -15,17 +15,7 @@ async def on_ready():
         for user in server.members:
             total_users += 1
 
-    print(f"""\n
-    |===============================|
-    | Discord.py up, Server started |
-    | I'm in as {client.user} |
-    |===============================|
-    | HTTP Requests,data and errors |
-    |===============================|
-    
-    \tServer count: {len(client.servers)}
-    \tMember count: {total_users}
-    \n""")
+    print(f"\tServer count: {len(client.servers)}\n\tMember count: {total_users}")
 
     await client.change_presence(game=discord.Game(name=
         "with knives"#f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
@@ -38,7 +28,5 @@ async def on_message(m):
 
     if m.author in devs and m.content == ".hi":
         await client.send_message(m.channel, "yeet")
-
-
 
 client.run(os.getenv("BOT_TOKEN"))
