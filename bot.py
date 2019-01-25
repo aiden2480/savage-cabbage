@@ -23,12 +23,11 @@ async def on_ready():
 
 @client.event
 async def on_message(m):
-    blacklisted = []
+    if m.author.bot: return
+    devs = await message_setup(m, client)
 
-    if m.author.bot or m.author in blacklisted: return
-    devs = await message_setup(m)
-
-    if m.author in devs and m.content == ".hi":
+    print(m.content)
+    if ".hi" in m.content:
         await client.send_message(m.channel, "yeet")
 
 client.run(os.getenv("BOT_TOKEN"))

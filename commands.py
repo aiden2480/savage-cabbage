@@ -1,4 +1,4 @@
-async def message_setup(m):
+async def message_setup(m, client):
     _devs = [await client.get_user_info(id) for id in [
         272967064531238912,
         270138433370849280,
