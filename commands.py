@@ -43,6 +43,19 @@ class General:
         Admins: {devs[1].mention} ({devs[1]}) & {devs[2].mention} ({devs[2]})
         Total servers: **{len(client.servers)}**\nTotal users: **{total_users}**""")
 
+class Memes():
+    async def reddit(m, reddit, search = None):
+        while True:
+            if search: r_sub = reddit.subreddit('+'.join(args)).random()
+            else: r_sub = reddit.subreddit('Unexpected').random()
+            if r_sub.url.endswith('.png') or r_sub.url.endswith('.jpg'):
+                reddit_embed = discord.Embed(title= r_sub.title)
+                reddit_embed.set_image(url= r_sub.url)
+                reddit_embed.set_footer(text= f'⭐ {r_sub.score} 💭 {r_sub.num_comments}')
+                await client.send_message(m.channel, embed= reddit_embed)
+                break
+            else: continue
+
 class Roasts:
     async def roast(self):
         pass
