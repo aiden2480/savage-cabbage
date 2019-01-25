@@ -1,12 +1,15 @@
-# Importing & setup #
-import os, random, discord, asyncio
+# Importing #
+import os, praw, random, discord, asyncio
 from commands import *
-client = discord.Client()
+from util import *
 
-async def send():
-    pass
-print('connected!')
-# Once setup finished, event #
+# Setup #
+client = discord.Client()
+general = General()
+reddit = praw.Reddit(user_agent='Comment Extraction (by /u/USERNAME)',client_id=os.getenv('REDDIT_ID'),client_secret=os.getenv('REDDIT_TOKEN'))
+global m
+
+# Once setup finished #
 @client.event
 async def on_ready():
     global total_users
@@ -18,16 +21,25 @@ async def on_ready():
     print(f"\tServer count: {len(client.servers)}\n\tMember count: {total_users}")
 
     await client.change_presence(game=discord.Game(name=
-        "with knives"#f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
+        #"russian roulette 🔫 (re-coding!) up by feb!" 
+        f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
     ))
+
 
 @client.event
 async def on_message(m):
-    if m.author.bot: return
-    devs = await message_setup(m, client)
+    if m.author.bot:  return
+    devs, admin, rand, msg, cmd, args = await message_setup(m, client, random) # Establish needed variables
 
-    print(m.content)
-    if ".hi" in m.content:
-        await client.send_message(m.channel, "yeet")
+    if msg.split()[0].lower() in ["hey,", "hey"]: # Command
+        # General
+        if cmd in ["help"]:
+            await general.help()
+        if cmd in ["info"]:
+            await general.info()
+        
+        #
 
-client.run(os.getenv("BOT_TOKEN"))
+
+
+client.run("NDkyODczOTkyOTgyNzU3NDA2.Dyvbaw.O1ON481O6y39td3OoAha0_LPerw")
