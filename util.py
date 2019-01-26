@@ -1,13 +1,22 @@
-# Other long lists and variables #
-message_colours = [
-    0x7FFF00,  # Green
-    0x0000FF,  # Blue
-    0xFFFF00,  # Yellow
-    0x8A2BE2,  # Purple
-    0xFFA500,  # Orange
-    0xBFF442,  # Lime
-    0x00FFA5,
-]  # Light aqua
+# Message setup function #
+async def message_setup(m, client):
+    _devs = [
+        await client.get_user_info(id)
+        for id in [
+            272967064531238912,  # Get
+            270138433370849280,  # users
+            297229962971447297,  # ID,
+            499740673424097303,  # but who?
+        ]
+    ]
+
+    _admin = m.author in _devs
+    _msg = m.content
+    _cmd = _msg.split()[0][1:].lower()
+    _args = _msg.split()[1:]
+
+    return _devs, _admin, _msg, _cmd, _args
+
 
 roasts = [
     # "Oof!",
