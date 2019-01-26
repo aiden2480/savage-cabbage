@@ -3,14 +3,14 @@ import os
 import praw
 import time
 import random
-import dotenv
+# import dotenv
 import discord
 import asyncio
 from util import *
 
 # Setup #
 client = discord.Client()
-dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env")) # Load .env for local testing
+# dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env")) # Load .env for local testing
 reddit = praw.Reddit(
     user_agent= "Reddit Searching for Savage Cabbage#3666",
     client_id= os.getenv("REDDIT_ID"),

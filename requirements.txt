@@ -1,4 +1,3 @@
 praw
-dotenv
 asyncio
 discord.py
