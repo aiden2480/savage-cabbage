@@ -17,6 +17,10 @@ async def message_setup(m, client):
 
     return _devs, _admin, _msg, _cmd, _args
 
+# Attribute Dictionary function (for accessing values as attributes)
+class AttrDict(dict):
+    def __getattr__(self, attr): return self[attr]
+    def __setattr__(self, attr, value): self[attr] = value
 
 roasts = [
     # "Oof!",
@@ -34,7 +38,7 @@ roasts = [
     # "I've seen some pricks in my life, but **you're a cactus!**",
     "You're as useless as **ejection seats** on a **helicopter**",
     "You bring everyone a lot of joy, when you **leave the room**",
-    "If what you don't know can't hurt you, you must be **invunreble!**",
+    "If what you don't know can't hurt you, you must be **invulnerable!**",
     "Somebody once told me that you aren't the sharpest tool in the shed",
     "You've got a photographic memory but **with the lens cover glued on**",
     "Roses are red, Violets are blue, God made me pretty, **What happened to you**?",
@@ -49,3 +53,15 @@ roasts_no_bold = [i.replace("**", "") for i in roasts]
 roasts_str = ""
 for i in roasts_no_bold:
     roasts_str += i + "\n"
+
+cmds = AttrDict({ # 'cmd': ['Description of help message', [Aliases], classifier]
+    # General
+    'help': ['Your average help message', [None], 'general'],
+    'info': ['Stats about the bot', [None], 'general'],
+    'invite': ['Invite links for the bot', ['invites'], 'general'],
+    'vote': ['Vote for the bot on Discord bot lists', ["upvote"], 'general'],
+    'suggest': ['Suggest stuff for the bot and report bugs idk', [None], 'general'],
+
+    # Roast
+    'roast': ['Utterly obliviate someone\'s self-esteem', ['burn', 'feelsbadman'], 'roast']
+})
