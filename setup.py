@@ -57,10 +57,11 @@ eightball_answers = [
 ]
 
 
-commands_run = 0
-one_in_what = 15
-greetings = ["Hey", "Yo", "Wassup", "Oi"]
-roasts_no_bold = [roast.replace("**", "") for roast in roasts]
-roasts_str = ""
+commands_run= commands_run_not_admin= 0
+roasts_str= ""
+
+one_in_what= 15
+greetings= ["Hey", "Yo", "Wassup", "Oi"]
+roasts_no_bold= [roast.replace("**", "") for roast in roasts]
 for roast in roasts_no_bold:
-    roasts_str += f"{roast}\n"
+    roasts_str+= f"{roast}\n"

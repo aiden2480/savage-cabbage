@@ -1,6 +1,6 @@
 # This is the stuff that is constantly changing
 
-
+import time
 import random
 import discord
 from setup import AttrDict
@@ -50,7 +50,8 @@ async def change_status(client, dev, *message):
         # (3, "Hentai with Jensen"),
     ])
 
-    if message: status = (status[0], '%s || %s' % (status[1], message[0]))
+    status = (status[0], status[1]+ ' |~| $help')
+    if message: status = (status[0], '%s |~| %s' % (status[1], message[0]))
 
     await client.change_presence(
         game= discord.Game(
@@ -59,11 +60,10 @@ async def change_status(client, dev, *message):
             url= "https://twitch.tv/chocolatejade42",
         ))
     
-    
-    return status
+    return status # Type tuple
 
 
-cmd_classes = ['general', 'roast', 'meme']
+cmd_classes = ['general', 'dm', 'roast', 'meme', 'text', 'fun']
 cmds = AttrDict({ # 'cmd': ['Description of help message', [Aliases], classifier]
     # General
     'help': ['Your average help message', [None], 'general'],
@@ -87,4 +87,5 @@ cmds = AttrDict({ # 'cmd': ['Description of help message', [Aliases], classifier
     # Fun commands
     '8ball': ['Ask the all-mighty, all-knowing :8ball:!', [None], 'fun'],
     'spr': ['Play spr!', [None], 'fun'],
+    'ttt': ['Play Tic Tac Toe!', ['tictactoe'], 'fun'],
 })
