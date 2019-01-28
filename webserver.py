@@ -1,12 +1,13 @@
+# Flask setup
 from flask import *
-web = Flask(__name__)
+web = Flask('Savage Cabbage Website')
 
 # Routes
 @web.route('/')
-def index():  return web.send_static_file('./web/index.html')
+def index(): return render_template("index.html")
 
 @web.route('/invite')
-def invite(): return web.send_static_file('./web/invite.html')
+def invite(): return render_template("invite.html")
 
 
 if __name__ == "__main__":
