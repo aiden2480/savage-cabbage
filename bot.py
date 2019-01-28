@@ -1,29 +1,16 @@
 # Importing #
 import os
-import praw
 import time
 import random
 import discord
 import asyncio
+from util import *
 from setup import *
 from datetime import datetime as dt
 
-
 # Setup #
 client = discord.Client()
-run_time = dt.now()
-
-try:
-    import dotenv
-    dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env")) # Load .env file for local testing
-except ModuleNotFoundError: pass # 'dotenv' not in requirements.txt so this snippet won't run
-
-reddit = praw.Reddit(
-    user_agent= "Reddit Searching for Savage Cabbage#3666",
-    client_id= os.getenv("REDDIT_ID"),
-    client_secret= os.getenv("REDDIT_TOKEN"),
-)
-
+run_time = (str(dt.now())[:19], time.time()) # Gets rid of the extra bits on the end
 
 # Once setup finished #
 @client.event
@@ -34,16 +21,9 @@ async def on_ready():
         for user in server.members:
             total_users += 1
 
-    print(f"\tLogged in as {client.user}\n\tServer count: {len(client.servers)}\n\tMember count: {total_users}")
-
-    await client.change_presence(game=discord.Game(name=
-        #"russian roulette 🔫 (unstable as I'm hosting on my local computer for devving)"
-        #"Day two: This place is messing with my mind, I think I'm seeing things"
-        "Day three: I lost the game"
-
-        # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
-    ))
-
+    print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}\n\tServer count: {len(client.servers)}\n\tMember count: {total_users}")
+    
+    await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
 
 @client.event
 async def on_message(m):
@@ -67,11 +47,15 @@ async def on_message(m):
 
     if msg[0] == "$":  # Command
         print('Command run:', m.author, cmd, " ".join(args))
-        
+        global commands_run
+        commands_run += 1
+
+        # Testing
+
         # General commands
-        if cmd in ["help"]:
+        if cmd in ["help"] + cmds.help[1]:
             if not args:
-                await send(":tools: Help :gear:",
+                return await send(":tools: Help :gear:",
                     f"""
                     Every time a message is sent, there is a one in **{one_in_what}** chance that the messenger will be insulted (Send `$roasts` for the insults)
                     To prevent a user from being roasted, add `don\'t roast the roaster` to thier roles
@@ -84,45 +68,62 @@ async def on_message(m):
                 _ = ''
                 for alias in cmds[args[0]][1]:
                     _ += str(alias)+ ', '
-                print(_)
 
-                await send(f":tools: Help for {args[0]} :gear:",
-                    cmds[args[0]],
-                    #"Aliases: "+ _[:-2]
-                    )
+                await send(f":tools: Help for command **{args[0]}** :gear:",
+                    cmds[args[0]][0],
+                    "Aliases: "+ _[:-2])
+
             except KeyError:
                 await send("", "lol that command doesn't exist")
 
-        elif cmd in ["info"]:
+        elif cmd in ["info"] + cmds.info[1]:
             await send("🇮 Info :thinking:",
-                f"""Created by {devs[0].mention} ({devs[0]})
-                Admins: {devs[1].mention} ({devs[1]}) & {devs[2].mention} ({devs[2]})
+                f"""Created by {devs[0].mention} (**{devs[0]}**)
+                Admins: {devs[1].mention} (**{devs[1]}**) & {devs[2].mention} (**{devs[2]}**)
+                
                 Total servers: **{len(client.servers)}**\nTotal users: **{total_users}**""",
-                f"Bot last restart: {run_time}")
+                f"Last refresh: {run_time[0]} AEST")
+            if admin:
+                _ = [time.time() - run_time[1], 'seconds'] # seconds
+                if _[0] >= 86400: _ = [_[0]/86400, 'days']
+                elif _[0] >= 3600: _ = [_[0]/3600, 'hours']
+                elif _[0] >= 60: _ = [_[0]/60, 'minutes']
 
-        elif cmd in ["invite", "invites"]:
+                await send('Admin Info', f"""Commands run this refresh: **{commands_run}**
+                    Time since last refresh: **{round(_[0], 3)} {_[1]}**""",
+                    sendTyping= False)
+
+        elif cmd in ["status"] + cmds.status[1]:
+            await client.send_typing(m.channel)
+            await asyncio.sleep(0.75)
+            if admin and args:  _ = await change_status(client, devs[0], ' '.join(args))
+            else:  _ = await change_status(client, devs[0])
+            
+            await send('Status changed to **{} {}**'.format({0:'Playing',1:'Streaming',2:'Listening to',3:'Watching'}[_[0]],_[1]), "", "Want to suggest a status? Use $suggest!", sendTyping= False)
+
+        elif cmd in ["invite"] + cmds.invite[1]:
             await send("**:mailbox_with_mail: Invite :homes:**",
-                f"""Invite me to your server [here](https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201590848)
+                f"""Invite me to your server [here](https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024)
                 Join my support server: https://discord.gg/AJj45Sj""")
 
-        elif cmd in ["vote", "upvote"]:
+        elif cmd in ["vote"] + cmds.vote[1]:
             await send("**:arrow_up: Upvote :newspaper2:**",
                 " - [**Discord Bot List**](https://discordbotlist.com/bots/492873992982757406/upvote)")
-        
-        elif cmd in ["suggest"]:
-            if args:
-                await send(f"Suggestion from {m.author}",
-                f"{m.author.mention}: **{' '.join(args)}**",
-                channel= discord.Object(502963219879559168))
-                
-                await send( "Suggestion recevied", "kewlio")
-            else:
-                await send("Suggestion error", "Were you going to suggest anything? 🤷‍")
 
-        # Admin commands
+        # DM commands
+        elif cmd in ["suggest"] + cmds.suggest[1]:
+            if m.server == None:
+                if args:
+                    await send(f"Suggestion from {m.author}",
+                    f"{m.author.mention}: **{' '.join(args)}**",
+                    channel= discord.Object(502963219879559168))
+                    
+                    await send( "Suggestion recevied", "kewlio")
+                else: await send('', "Were you going to suggest anything? 🤷‍")
+            else: await send('', 'lol this is a DM command noob')
 
         # Roast commands
-        elif cmd in ["roast", "burn", "feelsbadman"]:
+        elif cmd in ["roast"] + cmds.roast[1]:
             if not args:
                 await send(random.choice(greetings) + " " + m.author.name + ",",
                     random.choice(roasts))
@@ -134,30 +135,67 @@ async def on_message(m):
                 await send(random.choice(greetings) + " " + " ".join(args) + ",",
                     random.choice(roasts))
 
-        # Memes
-        elif cmd in ["reddit", "meme"]:
+        # Meme commands
+        elif cmd in ["reddit"] + cmds.reddit[1]:
             _ = time.time()
             await client.send_typing(m.channel)
+            
             while True:
-                if args:
-                    r_sub = reddit.subreddit("+".join(args)).random()
-                else:
-                    r_sub = reddit.subreddit("+".join([
-                        "meirl", "me_irl",
-                        "dankmemes", "PrequelMemes",
-                        "Hmmm", "wholesomememes",
-                        "MinecraftMemes",
-                        # "DeepFriedMemes",
-                    ])).random()
+                r_sub = reddit.subreddit("+".join([
+                    "meirl", "me_irl",
+                    "dankmemes", "PrequelMemes",
+                    "Hmmm", "wholesomememes",
+                    "MinecraftMemes", "RobloxMemes",
+                    "DeepFriedMemes",
+                ])).random()
+
                 if r_sub.url.endswith(".png") or r_sub.url.endswith(".jpg"):
-                    reddit_embed = discord.Embed(title=r_sub.title)
-                    reddit_embed.set_image(url=r_sub.url)
-                    reddit_embed.set_footer(text=f"⬆ {r_sub.score} 💭 {r_sub.num_comments}")
-                    await client.send_message(m.channel, embed=reddit_embed)
-                    await send('',str(round(time.time()-_, 3))+ ' sec', sendTyping=False)
+                    reddit_embed = discord.Embed(title= r_sub.title)
+                    reddit_embed.set_image(url= r_sub.url)
+                    reddit_embed.set_footer(text= f"⬆ {r_sub.score} 💭 {r_sub.num_comments}")
+                    
+                    await client.send_message(m.channel, embed= reddit_embed)
+                    if m.author in devs: await send('',str(round(time.time()-_, 3))+ ' sec', sendTyping= False)
                     break
-                else:
-                    continue
+                else: continue
+        
+        # Fun commands
+        elif cmd in ['8ball'] + cmds['8ball'][1]:
+            if args:
+                await send(f':8ball: {m.content} :rabbit2:', random.choice(eightball_answers))
+            else:
+                await send('', 'What did you want to ask the all-mighty 8ball? (c to cancel)')
+                _ = await wait_for_message(author= m.author)
+                if _.content != 'c':
+                    await send(f':8ball: {m.content} :rabbit2:', random.choice(eightball_answers))
+        
+        elif cmd in ["spr"] + cmds.spr[1]:
+            if not args: return await send('', 'lol u need to play from scissors, paper and rock')
+            if not args[0].lower() in ['scissors', 'paper', 'rock', '✂', '📰', '🗞']:
+                return await send('', 'lol u need to play from scissors, paper and rock')
+            args[0] = args[0].lower()
+            
+            _ = random.choice(['scissors', 'paper', 'rock'])
+            args[0] = {'✂': 'scissors', '📰': 'paper', '🗞': 'paper'}[args[0]]
+
+            if args[0] == _: result = "It's a tie!"
+            elif args[0] == 'scissors' and _ == 'paper': result = 'You win!'
+            elif args[0] == 'paper' and _ == 'rock': result = 'You win!'
+            elif args[0] == 'rock' and _ == 'scissors': result = 'You win!'
+            else: result = 'I win!'
+            
+            await send(f':scissors: SPR with {m.author} :newspaper:',
+                f"I chose **{_}** and you chose **{args[0]}**, **{result}**")
+
+        # Text commands
+        elif cmd in ["partyparrot"] + cmds.partyparrot[1]:
+            if args:
+                await send('', str(emojis.partyparrot).join(args))
+            else:
+                await send('', f'What do you want me to {emojis.partyparrot}? (c to cancel)')
+                _ = await client.wait_for_message(author= m.author)
+                if _.content != 'c':
+                    await send('', _.content.replace(' ', emojis.partyparrot))
 
 
 client.run(os.getenv("BOT_TOKEN"))

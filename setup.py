@@ -1,21 +1,21 @@
-# Message setup function #
-async def message_setup(m, client):
-    _devs = [
-        await client.get_user_info(id)
-        for id in [
-            272967064531238912,  # Get
-            270138433370849280,  # users
-            297229962971447297,  # ID,
-            499740673424097303,  # but who?
-        ]
-    ]
+# Imported at the beginning, referenced to but not changed
 
-    _admin = m.author in _devs
-    _msg = m.content
-    _cmd = _msg.split()[0][1:].lower()
-    _args = _msg.split()[1:]
+import os
+import praw
 
-    return _devs, _admin, _msg, _cmd, _args
+try:
+    import dotenv
+    dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env")) # Load .env file for local testing
+except ModuleNotFoundError: pass # 'dotenv' not in requirements.txt so this snippet won't run
+
+reddit = praw.Reddit(
+    user_agent= "Reddit Searching for Savage Cabbage#3666",
+    client_id= os.getenv("REDDIT_ID"),
+    client_secret= os.getenv("REDDIT_TOKEN"),
+)
+
+class emojis:
+    partyparrot = '<a:partyparrot:538925147634008067>'
 
 # Attribute Dictionary function (for accessing values as attributes)
 class AttrDict(dict):
@@ -47,21 +47,20 @@ roasts = [
     # "You're as straight as the pole your mum dances on"
 ]
 
+eightball_answers = [
+    # Yes
+    "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Duh, of course"
+    # Maybe
+    "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "whaaaaat? y u no *concentrate*?", 
+    # No
+    "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "Heck no", "u wish", 
+]
+
+
+commands_run = 0
 one_in_what = 15
 greetings = ["Hey", "Yo", "Wassup", "Oi"]
-roasts_no_bold = [i.replace("**", "") for i in roasts]
+roasts_no_bold = [roast.replace("**", "") for roast in roasts]
 roasts_str = ""
-for i in roasts_no_bold:
-    roasts_str += i + "\n"
-
-cmds = AttrDict({ # 'cmd': ['Description of help message', [Aliases], classifier]
-    # General
-    'help': ['Your average help message', [None], 'general'],
-    'info': ['Stats about the bot', [None], 'general'],
-    'invite': ['Invite links for the bot', ['invites'], 'general'],
-    'vote': ['Vote for the bot on Discord bot lists', ["upvote"], 'general'],
-    'suggest': ['Suggest stuff for the bot and report bugs idk', [None], 'general'],
-
-    # Roast
-    'roast': ['Utterly obliviate someone\'s self-esteem', ['burn', 'feelsbadman'], 'roast']
-})
+for roast in roasts_no_bold:
+    roasts_str += f"{roast}\n"
