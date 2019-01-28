@@ -46,7 +46,7 @@ async def on_message(m):
     if msg[0] == "$" or msg.startswith(client.user.mention):
         if cmd: print('Command run:', m.author, cmd, " ".join(args))
         
-        global commands_run, commands_run_not_admin
+        global commands_run, commands_run_not_admin, current_status
         
         commands_run += 1
         if not admin: commands_run_not_admin += 1
