@@ -29,8 +29,8 @@ async def change_status(client, dev, *message):
     status = random.choice([
         # Playing
         (0, "Tetris"),
-        (0, "with yo mum"),
         # (0, "█▀█ █▄█ ▀█▀"),
+        (0, "with ya mum (We're playing connect 4, what did you think?)"),
 
         # Streaming
         (1, "¯\_(ツ)_/¯"),
@@ -63,8 +63,7 @@ async def change_status(client, dev, *message):
     return status # Type tuple
 
 
-cmd_classes = ['general', 'dm', 'roast', 'meme', 'text', 'fun']
-cmds = AttrDict({ # 'cmd': ['Description of help message', [Aliases], classifier]
+CMDS = AttrDict({ # 'cmd': ['Description of help message', [Aliases], classifier]
     # General
     'help': ['Your average help message', [None], 'general'],
     'info': ['Stats about the bot', [None], 'general'],
@@ -89,3 +88,4 @@ cmds = AttrDict({ # 'cmd': ['Description of help message', [Aliases], classifier
     'spr': ['Play spr!', [None], 'fun'],
     'ttt': ['Play Tic Tac Toe!', ['tictactoe'], 'fun'],
 })
+CMD_CLASSES= list(set([CMDS[command][2] for command in CMDS]))

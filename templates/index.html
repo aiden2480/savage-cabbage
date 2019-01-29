@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Savage Cabbage Bot</title>
+		<link rel="icon" href="/static/icon.jpg"><link rel="stylesheet" type="text/css" href="/static/styling.css"><meta charset="UTF-8"><meta name="author" content="chocolatejade42"><meta name="keywords" content="Discord,SavageCabbage,Python,DiscordPy"><meta name="description" content="Savage Cabbage Discord Bot">
+	</head>
+	<body>
+		<div class="navbar">
+			<img src="/static/icon.jpg" alt="icon" style="width:47.5px;height:47.5px">
+			<a href="#home">Home</a>
+			<a href="#info">Info</a>
+			<a href="#cmds">Commands</a>
+			<a href="#stats">Stats</a>
+			<a href="#contact">Contact</a>
+			<a href="invite" target="_blank">Invite</a>
+		</div>
+		<br>
+		
+		<h1 id="home">Home</h1>
+		<p>Welcome to the official website for <b>Savage Cabbage#3666</b></p>
+
+		<h1 id="info">Info</h1>
+		<p>Savage Cabbage was developed by <a href="https://repl.it/@chocolatejade42" target="_blank">chocolatejade42</a> and started development on the 22<sup>nd</sup> of September 2018. </p>
+		
+		<h1 id="cmds">Commands</h1>
+		<p>The different command classes are:</p>
+		<ul>
+			{% for class in cmd_classes %}
+			<li>{{class}}</li>
+			{% endfor %}
+		</ul>
+
+		<h1 id="stats">Stats</h1>
+		<p>Uptime stats and error logs can be viewed <a href="https://stats.uptimerobot.com/M1NrQcXJv/781037937" target="_blank">here</a>. This only shows stats from the last week though</p>
+		
+		<h1 id="contact">Contact</h1>
+		<p>Contact the developer(s) by using the <u>$suggest</u> command <i>in a DM</i></p>
+	</body>
+</html>

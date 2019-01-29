@@ -53,8 +53,9 @@ async def on_message(m):
             
     # Testing
 
+
     # General commands
-        if cmd in ["help"] + cmds.help[1]:
+        if cmd in ["help"] + CMDS.help[1]:
             if not args:
                 return await send(":tools: Help :gear:",
                     f"""
@@ -67,17 +68,17 @@ async def on_message(m):
             args = [arg.lower() for arg in args]
             try:
                 _ = ''
-                for alias in cmds[args[0]][1]:
+                for alias in CMDS[args[0]][1]:
                     _ += str(alias)+ ', '
 
                 await send(f":tools: Help for command **{args[0]}** :gear:",
-                    cmds[args[0]][0],
+                    CMDS[args[0]][0],
                     "Aliases: "+ _[:-2])
 
             except KeyError:
                 await send("", "lol that command doesn't exist")
 
-        elif cmd in ["info"] + cmds.info[1]:
+        elif cmd in ["info"] + CMDS.info[1]:
             _ = [time.time() - run_time[1], 'seconds']
             if _[0] >= 86400: _ = [_[0]/86400, 'days']
             elif _[0] >= 3600: _ = [_[0]/3600, 'hours']
@@ -100,25 +101,25 @@ async def on_message(m):
                     Commands not run by a dev: **{commands_run_not_admin}**""",
                     sendTyping= False)
 
-        elif cmd in ["status"] + cmds.status[1]:
+        elif cmd in ["status"] + CMDS.status[1]:
             await client.send_typing(m.channel)
             await asyncio.sleep(0.75)
             if admin and args:  _ = await change_status(client, devs[0], ' '.join(args))
             else: _ = await change_status(client, devs[0])
             
-            await send('Status changed to **{} {}**'.format({0:'Playing',1:'Streaming',2:'Listening to',3:'Watching'}[_[0]],_[1]), "", "Want to suggest a status? Use $suggest!", sendTyping= False)
+            await send('Status changed to **{} {}**'.format({0:'Playing',1:'Streaming',2:'Listening to',3:'Watching'}[_[0]],_[1]), "", "Want to suggest a status? Use $suggest in a DM!", sendTyping= False)
 
-        elif cmd in ["invite"] + cmds.invite[1]:
+        elif cmd in ["invite"] + CMDS.invite[1]:
             await send("**:mailbox_with_mail: Invite :homes:**",
                 f"""Invite me to your server [here](https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024)
                 Join my support server: https://discord.gg/AJj45Sj""")
 
-        elif cmd in ["vote"] + cmds.vote[1]:
+        elif cmd in ["vote"] + CMDS.vote[1]:
             await send("**:arrow_up: Upvote :newspaper2:**",
                 " - [**Discord Bot List**](https://discordbotlist.com/bots/492873992982757406/upvote)")
 
     # DM commands
-        elif cmd in ["suggest"] + cmds.suggest[1]:
+        elif cmd in ["suggest"] + CMDS.suggest[1]:
             if m.server == None:
                 if args:
                     await send(f"Suggestion from {m.author}",
@@ -130,7 +131,7 @@ async def on_message(m):
             else: await send('', 'lol this is a DM command noob')
 
     # Roast commands
-        elif cmd in ["roast"] + cmds.roast[1]:
+        elif cmd in ["roast"] + CMDS.roast[1]:
             if not args:
                 await send(random.choice(greetings) + " " + m.author.name + ",",
                     random.choice(roasts))
@@ -143,7 +144,7 @@ async def on_message(m):
                     random.choice(roasts))
 
     # Meme commands
-        elif cmd in ["reddit"] + cmds.reddit[1]:
+        elif cmd in ["reddit"] + CMDS.reddit[1]:
             _ = time.time()
             await client.send_typing(m.channel)
 
@@ -167,7 +168,7 @@ async def on_message(m):
                 else: continue
 
     # Fun commands
-        elif cmd in ['8ball'] + cmds['8ball'][1]:
+        elif cmd in ['8ball'] + CMDS['8ball'][1]:
             if args:
                 await send(f':8ball: {m.content} :rabbit2:', random.choice(eightball_answers))
             else:
@@ -176,7 +177,7 @@ async def on_message(m):
                 if _.content != 'c':
                     await send(f':8ball: {m.content} :rabbit2:', random.choice(eightball_answers))
 
-        elif cmd in ["spr"] + cmds.spr[1]:
+        elif cmd in ["spr"] + CMDS.spr[1]:
             if not args: return await send('', 'lol u need to play from scissors, paper and rock')
             if not args[0].lower() in ['scissors', 'paper', 'rock', '✂', '📰', '🗞']:
                 return await send('', 'lol u need to play from scissors, paper and rock')
@@ -195,7 +196,7 @@ async def on_message(m):
                 f"I chose **{_}** and you chose **{args[0]}**, **{result}**")
 
     # Text commands
-        elif cmd in ["partyparrot"] + cmds.partyparrot[1]:
+        elif cmd in ["partyparrot"] + CMDS.partyparrot[1]:
             if args: await send('', str(emojis.partyparrot).join(args))
             else: await send('', f'What do you want me to {emojis.partyparrot}?')
 
