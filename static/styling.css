@@ -21,6 +21,10 @@ h1 {
     -moz-columns: 2;
     font-family: var(--font);
     color: #EAE0C7;
+} a {
+    color: #EAE0C7;
+    font-family: var(--font);
+    size: 200px
 }
 
 /* Navbar styling */

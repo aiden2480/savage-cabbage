@@ -1,5 +1,4 @@
 # Importing #
-from util import *
 from setup import *
 from datetime import datetime as dt
 import os, time, random, discord, asyncio

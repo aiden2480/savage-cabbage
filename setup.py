@@ -62,6 +62,11 @@ async def change_status(client, dev, *message):
     
     return status # Type tuple
 
+# Attribute Dictionary function (for accessing values as attributes)
+class AttrDict(dict):
+    def __getattr__(self, attr): return self[attr]
+    def __setattr__(self, attr, value): self[attr] = value
+
 # 'cmd': ['Description of help message', [Aliases], classifier]
 CMDS = AttrDict({
     # General
@@ -107,11 +112,6 @@ reddit = praw.Reddit(
 # Emojis code
 class emojis:
     partyparrot = '<a:partyparrot:538925147634008067>'
-
-# Attribute Dictionary function (for accessing values as attributes)
-class AttrDict(dict):
-    def __getattr__(self, attr): return self[attr]
-    def __setattr__(self, attr, value): self[attr] = value
 
 # Roasts list
 roasts = [
