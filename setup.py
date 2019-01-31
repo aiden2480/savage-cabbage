@@ -97,13 +97,16 @@ CMDS = AttrDict({
     # Meme
     'reddit': ['Get the freshest memes around', ['meme'], 'meme'],
 
+    # Image
+    'imgur': ["Get images from imgur!", ["image"], 'image'],
+    
     # Text
     'partyparrot': ['Send kewl messages with partyparrot', ['party'], 'text'],
 
     # Fun commands
     '8ball': ['Ask the all-mighty, all-knowing 🎱!', [None], 'fun'],
     'spr': ['Play spr!', [None], 'fun'],
-    'ttt': ['Play Tic Tac Toe!', ['tictactoe'], 'fun'],
+    #'ttt': ['Play Tic Tac Toe!', ['tictactoe'], 'fun'],
 })
 
 CMD_CLASSES= list(sorted(set([CMDS[command][2] for command in CMDS])))
@@ -120,16 +123,17 @@ try:
     dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 except ModuleNotFoundError: pass
 
-# Setup reddit
-reddit = praw.Reddit(
+# Setup third-party authentication
+reddit= praw.Reddit(
     user_agent= "Reddit Searching for Savage Cabbage#3666",
     client_id= os.getenv("REDDIT_ID"),
-    client_secret= os.getenv("REDDIT_TOKEN"),
-)
+    client_secret= os.getenv("REDDIT_TOKEN"))
+
+imgur_auth= "Client-ID "+ os.getenv("IMGUR_ID")
 
 # Emojis code
 class emojis:
-    partyparrot = '<a:partyparrot:538925147634008067>'
+    partyparrot= '<a:partyparrot:538925147634008067>'
 
 # Roasts list
 roasts = [

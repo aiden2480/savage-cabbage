@@ -4,6 +4,7 @@ import time
 import random
 import discord
 import asyncio
+import requests
 from setup import *
 
 # Setup #
@@ -29,7 +30,7 @@ async def on_message(m):
     global commands_run, commands_run_not_admin, current_status
 
   # Send function
-    async def send(title, message, footer= None, fields= {}, channel= m.channel, sendTyping= True):
+    async def send(title, message, footer= None, image= None, thumbnail= None, fields= {}, channel= m.channel, sendTyping= True):
         if sendTyping:
             await client.send_typing(channel)
             await asyncio.sleep(0.75)
@@ -41,7 +42,9 @@ async def on_message(m):
         )
 
         if footer: embed.set_footer(text= footer)
-        for field in fields.keys(): embed.add_field(name= field, value= fields[field])
+        if image: embed.set_image(url= image)
+        if thumbnail: embed.set_thumbnail()
+        for field in fields: embed.add_field(name= field, value= fields[field])
         
         await client.send_message(channel, embed= embed)
 
@@ -93,12 +96,12 @@ async def on_message(m):
             elif _[0] >= 60: _ = [_[0]/60, 'minutes']
             _ = [round(_[0], 3), _[1]]
             
-            await send("🇮 Info :thinking:",
-                f"""Created by {devs[0].mention} (**{devs[0]}**)
-                Admins: {devs[1].mention} (**{devs[1]}**) & {devs[2].mention} (**{devs[2]}**)
-                
-                Total servers: **{len(client.servers)}**\nTotal users: **{total_users}**""",
-                footer= f"Last refresh: {run_time[0]} AEST ({_[0]} {_[1]} ago)")
+            #await send("🇮 Info :thinking:",
+            #    f"""Created by {devs[0].mention} (**{devs[0]}**)
+            #    Admins: {devs[1].mention} (**{devs[1]}**) & {devs[2].mention} (**{devs[2]}**)
+            #
+            #    Total servers: **{len(client.servers)}**\nTotal users: **{total_users}**""",
+            #    footer= f"Last refresh: {run_time[0]} AEST ({_[0]} {_[1]} ago)")
             
             await send("🇮 Info :thinking:",
                 f"Here's the info for **{client.user}**",
@@ -132,15 +135,18 @@ async def on_message(m):
                 "",
                 footer= "Want to suggest a status? Use $suggest in a DM!",
                 sendTyping= False)
-
+        
         elif cmd in ["invite"] + CMDS.invite[1]:
             await send("**:mailbox_with_mail: Invite :homes:**",
-                f"""Invite me to your server [here](https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024)
-                Join my support server: https://discord.gg/AJj45Sj""")
-
+                f"""Invite me to your server [here]({BOT_INVITE_LINK})
+                Join my support server: {SUPPORT_SERVER_INVITE}""")
+    
         elif cmd in ["vote"] + CMDS.vote[1]:
             await send("**:arrow_up: Upvote :newspaper2:**",
                 " - [**Discord Bot List**](https://discordbotlist.com/bots/492873992982757406/upvote)")
+        
+        elif cmd in ["commands", "cmds"]:
+            await send("", "Use `$help` for help or see all my commands [on my website](https://savage-cabbage.herokuapp.com/#cmds)")
 
     # DM commands
         elif cmd in ["suggest"] + CMDS.suggest[1]:
@@ -193,6 +199,20 @@ async def on_message(m):
                             sendTyping= False)
                     break
                 else: continue
+    
+    # Image commands
+        elif cmd in ['imgur'] + CMDS.imgur[1]:
+            if not args: args = [random.choice(["memes", "birbs", "doggos"])] # Need to add more topics
+            imgur_data= requests.get(f"https://api.imgur.com/3/gallery/r/{args[0]}",
+                headers= {"Authorization": imgur_auth}).json()["data"]
+            imgur_submission= imgur_data[random.randint(1, 99)] # Control selection avaliable
+
+            try:
+                await send(imgur_submission["title"],
+                    "",
+                    image= imgur_submission["link"],
+                    footer= f"👀{imgur_submission['views']} 👍{imgur_submission['score']}")
+            except: await send("", "oof, no results :shrug:")
 
     # Fun commands
         elif cmd in ['8ball'] + CMDS['8ball'][1]:
@@ -201,7 +221,7 @@ async def on_message(m):
                     random.choice(eightball_answers))
             else:
                 await send('', 'What did you want to ask the all-mighty 8ball? (c to cancel)')
-                _ = await wait_for_message(author= m.author)
+                _ = await client.wait_for_message(author= m.author)
                 if _.content != 'c':
                     await send(f':8ball: {m.content} :rabbit2:',
                         random.choice(eightball_answers))
