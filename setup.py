@@ -4,6 +4,14 @@ import praw
 import time
 import random
 import discord
+from datetime import datetime as dt
+
+# Long and slightly complicated code that I probably could but can't be bothered to shorten
+_ = str(dt.now())[:19].split()
+__= _[1] # The time
+_= _[0].split('-')
+_.reverse()
+run_time= (" ".join(["/".join(_), __]), time.time())
 
 # Message setup function
 async def message_setup(m, client):
@@ -17,12 +25,16 @@ async def message_setup(m, client):
         ]
     ]
 
-    _admin = m.author in _devs
-    _msg = m.content
-    _cmd = _msg.split()[0][1:].lower()
-    _args = _msg.split()[1:]
+    _admin= m.author in _devs    
+    _total_users= 0
 
-    return _devs, _admin, _msg, _cmd, _args
+    for server in client.servers:
+        for member in server.members:
+            _total_users+= 1
+    
+    _in_support_server= m.author in client.get_server(str(496081601755611137)).members
+
+    return _devs, _admin, _total_users, _in_support_server
 
 # Change bot status
 async def change_status(client, dev, *message):
@@ -50,7 +62,7 @@ async def change_status(client, dev, *message):
         # (3, "Hentai with Jensen"),
     ])
 
-    status = (status[0], status[1]+ ' |~| $help')
+    status = (status[0], status[1]+ ' |~| $help |~| please fill out the bit.ly/savage-cabbage-survey')
     if message: status = (status[0], '%s |~| %s' % (status[1], message[0]))
 
     await client.change_presence(
@@ -72,12 +84,12 @@ CMDS = AttrDict({
     # General
     'help': ['Your average help message', [None], 'general'],
     'info': ['Stats about the bot', [None], 'general'],
-    'status': ['Change my status :hugging:', [None], 'general'],
+    'status': ['Change my status 🤗', [None], 'general'],
     'invite': ['Invite links for the bot', ['invites'], 'general'],
     'vote': ['Vote for the bot on Discord bot lists', ["upvote"], 'general'],
     
     # DM commands
-    'suggest': ['Suggest stuff for the bot and report bugs idk', ['bug'], 'dm'],
+    'suggest': ['Suggest stuff for the bot and report bugs', ['bug'], 'dm'],
 
     # Roast
     'roast': ['Utterly obliviate someone\'s self-esteem', ['burn', 'feelsbadman'], 'roast'],
@@ -86,15 +98,21 @@ CMDS = AttrDict({
     'reddit': ['Get the freshest memes around', ['meme'], 'meme'],
 
     # Text
-    'partyparrot': ['Send kewl messages with <a:partyparrot:538925147634008067>', ['party'], 'text'],
+    'partyparrot': ['Send kewl messages with partyparrot', ['party'], 'text'],
 
     # Fun commands
-    '8ball': ['Ask the all-mighty, all-knowing :8ball:!', [None], 'fun'],
+    '8ball': ['Ask the all-mighty, all-knowing 🎱!', [None], 'fun'],
     'spr': ['Play spr!', [None], 'fun'],
     'ttt': ['Play Tic Tac Toe!', ['tictactoe'], 'fun'],
 })
 
-CMD_CLASSES= list(set([CMDS[command][2] for command in CMDS]))
+CMD_CLASSES= list(sorted(set([CMDS[command][2] for command in CMDS])))
+CLASS_CMDS= {class_: [] for class_ in CMD_CLASSES}
+
+for class_ in CMD_CLASSES:
+    for command in CMDS:
+        if CMDS[command][2] == class_:
+            CLASS_CMDS[class_].append(command)
 
 # Load .env for local testing
 try:
@@ -157,3 +175,9 @@ one_in_what= 15
 greetings= ["Hey", "Yo", "Wassup", "Oi"]
 roasts_no_bold= [roast.replace("**", "") for roast in roasts]
 for roast in roasts_no_bold: roasts_str+= f"{roast}\n"
+
+BOT_VERSION= "v1.2"
+
+# HTML only stuff
+SUPPORT_SERVER_INVITE= "https://discord.gg/AJj45Sj"
+BOT_INVITE_LINK= "https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024"

@@ -1,33 +1,35 @@
 # Importing #
+import os
+import time
+import random
+import discord
+import asyncio
 from setup import *
-from datetime import datetime as dt
-import os, time, random, discord, asyncio
 
 # Setup #
 client = discord.Client()
-run_time = (str(dt.now())[:19], time.time()) # Gets rid of the extra bits on the end
 
 # Events #
 @client.event
 async def on_ready():
-    global total_users, current_status
-    total_users = 0
+    global current_status
+    _ = 0
     for server in client.servers:
         for user in server.members:
-            total_users += 1
+            _ += 1
 
-    print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}\n\tServer count: {len(client.servers)}\n\tMember count: {total_users}")
+    print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}\n\tServer count: {len(client.servers)}\n\tUser count: {_}")
     
     current_status = await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
 
 @client.event
 async def on_message(m):
+    msg= m.content
     if m.author.bot: return
-    try: devs, admin, msg, cmd, args = await message_setup(m, client)
-    except: return # Proper error handling 👌
+    global commands_run, commands_run_not_admin, current_status
 
   # Send function
-    async def send(title, message, footer= None, channel= m.channel, sendTyping= True):
+    async def send(title, message, footer= None, fields= {}, channel= m.channel, sendTyping= True):
         if sendTyping:
             await client.send_typing(channel)
             await asyncio.sleep(0.75)
@@ -39,19 +41,26 @@ async def on_message(m):
         )
 
         if footer: embed.set_footer(text= footer)
+        for field in fields.keys(): embed.add_field(name= field, value= fields[field])
+        
         await client.send_message(channel, embed= embed)
 
-  # Commands
-    if msg[0] == "$" or msg.startswith(client.user.mention):
-        if cmd: print('Command run:', m.author, cmd, " ".join(args))
-        
-        global commands_run, commands_run_not_admin, current_status
-        
+  # Commands (must go last because of how it's set up)
+    # Command setup vars, return if not command
+    if msg.lower().startswith('$') or msg.lower().startswith(client.user.mention):
+        try:
+            if msg.lower().startswith('$'):
+                cmd= msg[1:].split()[0].lower()
+                args= msg[1:].split()[1:]
+            else:
+                cmd= msg[21:].split()[0].lower()
+                args= msg[21:].split()[1:]
+        except: return # Not command and prefix is a coincidence
+        devs, admin, total_users, in_support_server = await message_setup(m, client)
+        if cmd in CMDS: print('Command run:', m.author, cmd, " ".join(args))
         commands_run += 1
         if not admin: commands_run_not_admin += 1
-            
-    # Testing
-
+    # Now the actual commands
 
     # General commands
         if cmd in ["help"] + CMDS.help[1]:
@@ -72,7 +81,7 @@ async def on_message(m):
 
                 await send(f":tools: Help for command **{args[0]}** :gear:",
                     CMDS[args[0]][0],
-                    "Aliases: "+ _[:-2])
+                    footer= "Aliases: "+ _[:-2])
 
             except KeyError:
                 await send("", "lol that command doesn't exist")
@@ -84,20 +93,33 @@ async def on_message(m):
             elif _[0] >= 60: _ = [_[0]/60, 'minutes']
             _ = [round(_[0], 3), _[1]]
             
-            total_users = 0
-            for server in client.servers:
-                for member in server.members:
-                    total_users += 1
-            
             await send("🇮 Info :thinking:",
                 f"""Created by {devs[0].mention} (**{devs[0]}**)
                 Admins: {devs[1].mention} (**{devs[1]}**) & {devs[2].mention} (**{devs[2]}**)
                 
                 Total servers: **{len(client.servers)}**\nTotal users: **{total_users}**""",
-                f"Last refresh: {run_time[0]} AEST ({_[0]} {_[1]} ago)")
+                footer= f"Last refresh: {run_time[0]} AEST ({_[0]} {_[1]} ago)")
+            
+            await send("🇮 Info :thinking:",
+                f"Here's the info for **{client.user}**",
+                footer= f"Last refresh {_[0]} {_[1]} ago",
+                fields= {
+                    "Developer :computer:": devs[0],
+                    #"Admins :tickets:": "%s &\n%s" % (devs[1], devs[2]), # Thier names are too long for my poor info message
+                    "Servers :homes:": len(client.servers),
+                    "Total users :busts_in_silhouette:": total_users,
+                    "Version :white_check_mark:": BOT_VERSION,
+                    "Last restart :calendar:": run_time[0],
+                    "Region :earth_asia:": "Australia",
+                    "Code platform :bow_and_arrow:": "GitHub",
+                    "Hosting service :dart:": "Heroku",
+                    "Language :airplane:": "discord.py async\nPython 3.7"
+                })
+            
             if admin:
-                await send('Admin Info', f"""Commands run this refresh: **{commands_run}**
-                    Commands not run by a dev: **{commands_run_not_admin}**""",
+                await send('Admin Info', '',
+                    fields= {"Commands run": commands_run,
+                        "Commands not run by a dev": commands_run_not_admin},
                     sendTyping= False)
 
         elif cmd in ["status"] + CMDS.status[1]:
@@ -106,7 +128,10 @@ async def on_message(m):
             if admin and args:  _ = await change_status(client, devs[0], ' '.join(args))
             else: _ = await change_status(client, devs[0])
             
-            await send('Status changed to **{} {}**'.format({0:'Playing',1:'Streaming',2:'Listening to',3:'Watching'}[_[0]],_[1]), "", "Want to suggest a status? Use $suggest in a DM!", sendTyping= False)
+            await send('Status changed to **{} {}**'.format({0:'Playing',1:'Streaming',2:'Listening to',3:'Watching'}[_[0]],_[1]),
+                "",
+                footer= "Want to suggest a status? Use $suggest in a DM!",
+                sendTyping= False)
 
         elif cmd in ["invite"] + CMDS.invite[1]:
             await send("**:mailbox_with_mail: Invite :homes:**",
@@ -122,8 +147,8 @@ async def on_message(m):
             if m.server == None:
                 if args:
                     await send(f"Suggestion from {m.author}",
-                    f"{m.author.mention}: **{' '.join(args)}**",
-                    channel= discord.Object(502963219879559168))
+                        f"{m.author.mention}: **{' '.join(args)}**",
+                        channel= discord.Object(502963219879559168))
                     
                     await send( "Suggestion recevied", "kewlio")
                 else: await send('', "Were you going to suggest anything? 🤷‍")
@@ -136,7 +161,8 @@ async def on_message(m):
                     random.choice(roasts))
             
             elif args[0].lower() == 'list':
-                await send("You asked for it buddy", roasts_str.replace('\n', '\n\n'))
+                await send("You asked for it buddy",
+                    roasts_str.replace('\n', '\n\n'))
 
             else:
                 await send(random.choice(greetings) + " " + " ".join(args) + ",",
@@ -162,19 +188,23 @@ async def on_message(m):
                     reddit_embed.set_footer(text= f"⬆ {r_sub.score} 💭 {r_sub.num_comments}")
 
                     await client.send_message(m.channel, embed= reddit_embed)
-                    if m.author in devs: await send('',str(round(time.time()-_, 3))+ ' sec', sendTyping= False)
+                    if m.author in devs:
+                        await send('',str(round(time.time()-_, 3))+ ' sec',
+                            sendTyping= False)
                     break
                 else: continue
 
     # Fun commands
         elif cmd in ['8ball'] + CMDS['8ball'][1]:
             if args:
-                await send(f':8ball: {m.content} :rabbit2:', random.choice(eightball_answers))
+                await send(f':8ball: {m.content} :rabbit2:',
+                    random.choice(eightball_answers))
             else:
                 await send('', 'What did you want to ask the all-mighty 8ball? (c to cancel)')
                 _ = await wait_for_message(author= m.author)
                 if _.content != 'c':
-                    await send(f':8ball: {m.content} :rabbit2:', random.choice(eightball_answers))
+                    await send(f':8ball: {m.content} :rabbit2:',
+                        random.choice(eightball_answers))
 
         elif cmd in ["spr"] + CMDS.spr[1]:
             if not args: return await send('', 'lol u need to play from scissors, paper and rock')

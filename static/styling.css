@@ -1,18 +1,18 @@
 /* Variables */
 :root {
     --font: "Comic Sans MS", cursive, sans-serif;
-} /* font-family: "Courier New", Courier, "Lucida Sans Typewriter" */
+}
 
 /* Main styling */
 h1 {
     color: #EAE0C7;
     font-family: var(--font);
     text-align: center;
-    background-color: #013300
+    background-color: #013300;
 } p {
     color: #EAE0C7;
     font-family: var(--font);
-    size: 200px
+    size: 200px;
 } body {
     background-color: #01A300
 } ul {
@@ -24,7 +24,7 @@ h1 {
 } a {
     color: #EAE0C7;
     font-family: var(--font);
-    size: 200px
+    size: 200px;
 }
 
 /* Navbar styling */
@@ -34,15 +34,21 @@ h1 {
     top: 0;
     width: 100%
 } .navbar img {
-    float: left
+    float: left;
 } .navbar a {
     float: left;
     display: block;
     color: #013300;
     font-family: var(--font);
     padding: 14px 16px;
-    text-decoration: none
+    text-decoration: none;
 } .navbar a:hover {
     background: #01A300;
-    color: #EAE0C7
+    color: #EAE0C7;
 }
+
+/* Custom scrollbar (condensed) */
+::-webkit-scrollbar {width: 10px}
+::-webkit-scrollbar-track {background: #EAE0C7}
+::-webkit-scrollbar-thumb {background: #01A300}
+::-webkit-scrollbar-thumb:hover {background: #555}
