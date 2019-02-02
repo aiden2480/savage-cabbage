@@ -82,7 +82,7 @@ class AttrDict(dict):
 # 'cmd': ['Description of help message', [Aliases], classifier]
 CMDS = AttrDict({
     # General
-    'help': ['Your average help message', [None], 'general'],
+    'help': ['Your average help message', ['cmds', 'whatsthis'], 'general'],
     'info': ['Stats about the bot', [None], 'general'],
     'status': ['Change my status 🤗', [None], 'general'],
     'invite': ['Invite links for the bot', ['invites'], 'general'],
@@ -162,7 +162,7 @@ roasts = [
 ]
 
 # Eightball answers for the 8ball command
-eightball_answers = [
+eightball_answers= [
     # Yes
     "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Duh, of course"
     # Maybe
@@ -180,8 +180,8 @@ greetings= ["Hey", "Yo", "Wassup", "Oi"]
 roasts_no_bold= [roast.replace("**", "") for roast in roasts]
 for roast in roasts_no_bold: roasts_str+= f"{roast}\n"
 
-BOT_VERSION= "v1.2"
+BOT_VERSION= "v0.3"
 
 # HTML only stuff
 SUPPORT_SERVER_INVITE= "https://discord.gg/AJj45Sj"
-BOT_INVITE_LINK= "https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024"
+BOT_INVITE_LINK= "https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024&response_type=code&redirect_uri=https%3A%2F%2Fsavage-cabbage.herokuapp.com%2Fserver-invite"

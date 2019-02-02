@@ -3,4 +3,4 @@
  - DM the bot `$suggest` to suggest a feature or report a bug
  - Blame Flynn ¯\\_(ツ)_/¯   (͡° ͜ʖ ͡°)
 
-```PS the website is: http://savagecabbage.tk```
+```PS the website is: https://savage-cabbage.herokuapp.com```
