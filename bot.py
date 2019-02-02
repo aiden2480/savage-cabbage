@@ -199,9 +199,9 @@ async def on_message(m):
             if not args: args = [random.choice(["memes", "birbs", "doggos"])] # Need to add more topics
             imgur_data= requests.get(f"https://api.imgur.com/3/gallery/r/{args[0]}",
                 headers= {"Authorization": imgur_auth}).json()["data"]
-            imgur_submission= imgur_data[random.randint(1, 99)] # Control selection avaliable
 
             try:
+                imgur_submission= imgur_data[random.randint(1, 99)] # Control selection avaliable
                 await send(imgur_submission["title"],
                     "",
                     image= imgur_submission["link"],
