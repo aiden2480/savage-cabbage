@@ -95,7 +95,7 @@ CMDS = AttrDict({
     'roast': ['Utterly obliviate someone\'s self-esteem', ['burn', 'feelsbadman'], 'roast'],
 
     # Meme
-    'reddit': ['Get the freshest memes around', ['meme'], 'meme'],
+    'meme': ['Get the freshest memes around', ['reddit'], 'memey'],
 
     # Image
     'imgur': ["Get images from imgur!", ["image"], 'image'],
@@ -137,8 +137,7 @@ class emojis:
 
 # Roasts list
 roasts = [
-    # "Oof!",
-    "Hecc off!",
+    "Heck off!",
     "You are a dirt puddle!",
     "Go commit **neck-rope**",
     "Go commit **bullet-face**",
@@ -148,17 +147,29 @@ roasts = [
     "You have a face made for **radio**",
     "Go commit **oxygen-not-reach-lung**",
     "Go commit **food-not-reach-stomach**",
+    "You are the reason **I doubt evolution**",
+    "I'm jealous of people that don't know you",
+    "A million years of evolution and **we get you???**",
+    "You're as useless as **handles** on a **snowball**",
+    "To which foundation do I need to donate to help you?",
+    "You're the reason the gene pool **needs a lifeguard**",
     "You're so ugly that Hello Kitty said **goodbye** to you",
-    # "I've seen some pricks in my life, but **you're a cactus!**",
+    "You're as bright as a black hole, and **twice** as dense",
+    "Your birth certificate is an **apology from the hospital**",
     "You're as useless as **ejection seats** on a **helicopter**",
-    "You bring everyone a lot of joy, when you **leave the room**",
-    "If what you don't know can't hurt you, you must be **invulnerable!**",
+    "Well I could agree with you, but then **we'd both be wrong**",
+    "You bring everyone a lot of joy when you **leave the room**",
+    "I don't have the time **nor the crayons** to explain it to you",
+    "Stephen Hawking did great with his disability, **why can't you**?",
     "Somebody once told me that you aren't the sharpest tool in the shed",
+    "If what you don't know can't hurt you, you must be **invulnerable!**",
     "You've got a photographic memory but **with the lens cover glued on**",
+    "I bet your brain feels as good as new, seeing as **you never use it**",
     "Roses are red, Violets are blue, God made me pretty, **What happened to you**?",
+    "I'd tell you to go outside, but that would just **ruin everyone else's day** too",
     "There are several people in this world that I find obnoxious and you are **all of them**",
+    "Yo mama so is so stupid that she climbed over a glass wall **to see what was behind it**",
     "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. **I think you owe it an apology**"
-    # "You're as straight as the pole your mum dances on"
 ]
 
 # Eightball answers for the 8ball command
@@ -178,10 +189,12 @@ roasts_str= ""
 one_in_what= 15
 greetings= ["Hey", "Yo", "Wassup", "Oi"]
 roasts_no_bold= [roast.replace("**", "") for roast in roasts]
-for roast in roasts_no_bold: roasts_str+= f"{roast}\n"
+for roast in sorted(roasts_no_bold): roasts_str+= f"{roast}\n"
+
+
 
 BOT_VERSION= "v0.3"
 
-# HTML only stuff
+# Links and global
 SUPPORT_SERVER_INVITE= "https://discord.gg/AJj45Sj"
 BOT_INVITE_LINK= "https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024&response_type=code&redirect_uri=https%3A%2F%2Fsavage-cabbage.herokuapp.com%2Fserver-invite"
