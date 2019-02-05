@@ -5,9 +5,9 @@ import random
 import discord
 import asyncio
 import requests
-from setup import *
 
 # Setup #
+from setup import *
 client = discord.Client()
 
 # Events #
@@ -19,7 +19,7 @@ async def on_ready():
         for user in server.members:
             _ += 1
 
-    print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}\n\tServer count: {len(client.servers)}\n\tUser count: {_}")
+    print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}") # \n\tServer count: {len(client.servers)}\n\tUser count: {_}")
 
     current_status = await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
 
@@ -30,7 +30,8 @@ async def on_message(m):
     global commands_run, commands_run_not_admin, current_status
 
   # Send function
-    async def send(title, message, footer= None, image= None, thumbnail= None, fields= {}, channel= m.channel, sendTyping= True):
+    async def send(title, message, footer= None, image= None, thumbnail= None,
+                   fields= {}, channel= m.channel, sendTyping= True):
         if sendTyping:
             await client.send_typing(channel)
             await asyncio.sleep(0.75)
@@ -53,17 +54,19 @@ async def on_message(m):
     if msg.lower().startswith('$') or msg.lower().startswith(client.user.mention):
         try:
             if msg.lower().startswith('$'):
-                cmd= msg[1:].split()[0].lower()
-                args= msg[1:].split()[1:]
+                cmd, args= msg[1:].split()[0].lower(), msg[1:].split()[1:]
             else:
-                cmd= msg[21:].split()[0].lower()
-                args= msg[21:].split()[1:]
+                cmd, args= msg[21:].split()[0].lower(), msg[21:].split()[1:]
         except: return # Not command and prefix is a coincidence
-        devs, admin, total_users, in_support_server = await message_setup(m, client)
-        if cmd in CMDS: print('Command run:', m.author, cmd, " ".join(args))
+        devs, admin, total_users, in_support_server= await message_setup(m, client)
+        
+        if cmd in CMDS:
+            print('Command run:', m.author, cmd, " ".join(args))
+            last_5_commands_run.append(f"{m.author}: {m.content}")
+            if len(last_5_commands_run) > 5: last_5_commands_run.pop(0)
+        
         commands_run += 1
         if not admin: commands_run_not_admin += 1
-    # Now the actual commands
 
     # General commands
         if cmd in ["help"] + CMDS.help[1]:
@@ -113,7 +116,7 @@ async def on_message(m):
                 })
 
             if admin:
-                await send('Admin Info', '',
+                await send('Admin Info', "**Last 5 commands run:**\n"+ '\n'.join([str(i) for i in last_5_commands_run]),
                     fields= {
                         "Commands run": commands_run,
                         "Commands not run by a dev": commands_run_not_admin},
@@ -169,17 +172,17 @@ async def on_message(m):
                     random.choice(roasts))
 
     # Meme commands
-        elif cmd in ["reddit"] + CMDS.reddit[1]:
+        elif cmd in ["meme"] + CMDS.meme[1]:
             _ = time.time()
             await client.send_typing(m.channel)
 
             while True:
                 r_sub = reddit.subreddit("+".join([
-                    "meirl", "me_irl",
-                    "dankmemes", "PrequelMemes",
-                    "Hmmm", "wholesomememes",
-                    "MinecraftMemes", "ROBLOXmemes",
-                    "DeepFriedMemes",
+                    #"meirl", "me_irl",
+                    "dankmemes"#, "PrequelMemes",
+                    #"Hmmm", "wholesomememes",
+                    #"MinecraftMemes", "ROBLOXmemes",
+                    #"DeepFriedMemes",
                 ])).random()
 
                 if r_sub.url.endswith(".png") or r_sub.url.endswith(".jpg"):
@@ -188,9 +191,6 @@ async def on_message(m):
                     reddit_embed.set_footer(text= f"⬆ {r_sub.score} 💭 {r_sub.num_comments}")
 
                     await client.send_message(m.channel, embed= reddit_embed)
-                    if m.author in devs:
-                        await send('',str(round(time.time()-_, 3))+ ' sec',
-                            sendTyping= False)
                     break
                 else: continue
     

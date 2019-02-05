@@ -7,11 +7,12 @@ import discord
 from datetime import datetime as dt
 
 # Long and slightly complicated code that I probably could but can't be bothered to shorten
-_ = str(dt.now())[:19].split()
-__= _[1] # The time
-_= _[0].split('-')
-_.reverse()
-run_time= (" ".join(["/".join(_), __]), time.time())
+if True: # Yeet I indented it because why not
+    _ = str(dt.now())[:19].split()
+    __= _[1] # The time
+    _= _[0].split('-')
+    _.reverse()
+    run_time= (" ".join(["/".join(_), __]), time.time())
 
 # Message setup function
 async def message_setup(m, client):
@@ -41,13 +42,19 @@ async def change_status(client, dev, *message):
     status = random.choice([
         # Playing
         (0, "Tetris"),
-        # (0, "█▀█ █▄█ ▀█▀"),
-        (0, "with ya mum (We're playing connect 4, what did you think?)"),
+        # (0, "with ya mum (We're playing connect 4, what did you think?)"),
 
         # Streaming
+        (1, "◉_◉"),
+        (1, "⌐■_■"),
+        (1, "(ง’̀-‘́)ง"),
+        (1, "( ͡ᵔ ͜ʖ ͡ᵔ )"),
         (1, "¯\_(ツ)_/¯"),
+        (1, "(づ￣ ³￣)づ"),
         (1, "(╯°□°）╯︵ ┻━┻"),
         (1, "┬─┬ ノ( ゜-゜ノ)"),
+        (1, "╭∩╮（︶︿︶）╭∩╮"),
+        (1, "┻━┻ ︵ ＼( °□° )／ ︵ ┻━┻"),
 
         # Listening to
         (2, "ASMR"),
@@ -133,7 +140,7 @@ imgur_auth= "Client-ID "+ os.getenv("IMGUR_ID")
 
 # Emojis code
 class emojis:
-    partyparrot= '<a:partyparrot:538925147634008067>'
+    partyparrot= "<a:partyparrot:538925147634008067>"
 
 # Roasts list
 roasts = [
@@ -157,18 +164,21 @@ roasts = [
     "You're as bright as a black hole, and **twice** as dense",
     "Your birth certificate is an **apology from the hospital**",
     "You're as useless as **ejection seats** on a **helicopter**",
-    "Well I could agree with you, but then **we'd both be wrong**",
     "You bring everyone a lot of joy when you **leave the room**",
+    "Well I could agree with you, but then **we'd both be wrong**",
     "I don't have the time **nor the crayons** to explain it to you",
+    "You have a face only a mother could love - **and she hates it!**",
     "Stephen Hawking did great with his disability, **why can't you**?",
     "Somebody once told me that you aren't the sharpest tool in the shed",
     "If what you don't know can't hurt you, you must be **invulnerable!**",
     "You've got a photographic memory but **with the lens cover glued on**",
     "I bet your brain feels as good as new, seeing as **you never use it**",
+    "You must have a very low opinion of people if you think they are your equals",
     "Roses are red, Violets are blue, God made me pretty, **What happened to you**?",
     "I'd tell you to go outside, but that would just **ruin everyone else's day** too",
     "There are several people in this world that I find obnoxious and you are **all of them**",
     "Yo mama so is so stupid that she climbed over a glass wall **to see what was behind it**",
+    "I would have liked to insult you, but with your intelligence, **it would have been a compliment**",
     "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. **I think you owe it an apology**"
 ]
 
@@ -186,6 +196,8 @@ eightball_answers= [
 # Other variables and data setup
 commands_run= commands_run_not_admin= 0
 roasts_str= ""
+last_5_commands_run= [None]
+
 one_in_what= 15
 greetings= ["Hey", "Yo", "Wassup", "Oi"]
 roasts_no_bold= [roast.replace("**", "") for roast in roasts]
