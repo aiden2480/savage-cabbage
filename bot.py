@@ -5,13 +5,58 @@ import random
 import discord
 import asyncio
 import requests
+import traceback
 
 # Setup #
 from setup import *
-client = discord.Client()
+client = discord.Client(shard_count= SHARD_COUNT)
 
-# Events #
-@client.event
+# Setup Events #
+@client.event # Error handling
+async def on_error(event, args):
+    print(type(args))
+    if type(args) == discord.Message:
+        m= args # The error is usually a message so args is usually a discord Message
+        devs, admin, total_users, in_support_server= await message_setup(m, client)
+        
+        embed= discord.Embed(
+            title= f"An error occoured during the **{event}** event",
+            description= f"**Message:**\n```{m.content}```",
+            color= 0xFF8C00)
+        
+        for field: content in {
+            "Server": m.server,
+            "Channel": m.channel,
+            "Author": m.auhtor,
+        }: embed.add_field(field, content)
+
+        await client.send_message(discord.Object(542467438004928512), embed= embed)
+        await client.send_message(m.channel, embed= discord.Embed(
+            title= "Oof, an error occoured",
+            description= f"Please [join the support server](https://savage-cabbage.herokuapp.com/server-invite) and tell **{devs[0]}** what happened to help fix this bug",
+            color= 0xFFA500,
+        ))
+
+@client.event # Log joining a server
+async def on_server_join(server: discord.Server):
+    print(f"Joined a server: {server.name}, members: {server.member_count}")
+    await client.send_message(discord.Object(542474215282966549), embed= discord.Embed(
+        title= "Server join",
+        description= f"Joined **{server.name}** (**{server.member_count}** members)",
+        color= 0x228B22,
+    ))
+
+@client.event # Log leaving a server
+async def on_server_remove(server: discord.Server):
+    print(f"Kicked from a server: {server.name}, members: {server.member_count}")
+    await client.send_message(discord.Object(542474215282966549), embed= discord.Embed(
+        title= "Left server",
+        description= f"Kicked from **{server.name}** (**{server.member_count}** members)",
+        color= 0xFF4500,
+    ))
+
+# Main Events #
+@client.event # Setup function
 async def on_ready():
     global current_status
     _ = 0
@@ -23,20 +68,20 @@ async def on_ready():
 
     current_status = await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
 
-@client.event
-async def on_message(m):
+@client.event # Main event (houses commands)
+async def on_message(m: discord.Message):
     msg= m.content
     if m.author.bot: return
     global commands_run, commands_run_not_admin, current_status
 
   # Send function
-    async def send(title, message, footer= None, image= None, thumbnail= None,
-                   fields= {}, channel= m.channel, sendTyping= True):
+    async def send( title, message, footer= None, image= None, thumbnail= None, set_author_img= False,
+                    fields= {}, channel= m.channel, sendTyping= True):
         if sendTyping:
             await client.send_typing(channel)
             await asyncio.sleep(0.75)
 
-        embed = discord.Embed(
+        embed= discord.Embed(
             title= title,
             description= message,
             color= discord.Color(random.randint(0, 0xFFFFFF)),
@@ -92,6 +137,9 @@ async def on_message(m):
             except KeyError:
                 await send("", "lol that command doesn't exist")
 
+        elif cmd in ['test']:
+            await send('', m.author.nam)
+        
         elif cmd in ["info"] + CMDS.info[1]:
             _ = [time.time() - run_time[1], 'seconds']
             if _[0] >= 86400: _ = [_[0]/86400, 'days']
@@ -112,7 +160,7 @@ async def on_message(m):
                     "Region :earth_asia:": "Australia",
                     "Code platform :bow_and_arrow:": "GitHub",
                     "Hosting service :dart:": "Heroku",
-                    "Language :airplane:": "discord.py async\nPython 3.7"
+                    "Language :airplane:": "discord.py async\nPython 3.7",
                 })
 
             if admin:
@@ -143,7 +191,8 @@ async def on_message(m):
                 " - [**Discord Bot List**](https://discordbotlist.com/bots/492873992982757406/upvote)")
 
         elif cmd in ["commands", "cmds"]:
-            await send("", "Use `$help` for help or see all my commands [on my website](https://savage-cabbage.herokuapp.com/#cmds)")
+            #await send("", "Use `$help` for help or see all my commands on my website:")
+            await client.send_message(m.channel, "Use `$help` for help or see all my commands on my website: https://savage-cabbage.herokuapp.com/#cmds")
 
     # DM commands
         elif cmd in ["suggest"] + CMDS.suggest[1]:
@@ -217,7 +266,7 @@ async def on_message(m):
                 await send('', 'What did you want to ask the all-mighty 8ball? (c to cancel)')
                 _ = await client.wait_for_message(author= m.author)
                 if _.content != 'c':
-                    await send(f':8ball: {m.content} :rabbit2:',
+                    await send(f':8ball: {" ".join(args)} :rabbit2:',
                         random.choice(eightball_answers))
 
         elif cmd in ["spr"] + CMDS.spr[1]:
@@ -242,7 +291,6 @@ async def on_message(m):
         elif cmd in ["partyparrot"] + CMDS.partyparrot[1]:
             if args: await send('', str(emojis.partyparrot).join(args))
             else: await send('', f'What do you want me to {emojis.partyparrot}?')
-
 
 
 client.run(os.getenv("BOT_TOKEN"))

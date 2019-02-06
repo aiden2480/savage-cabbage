@@ -116,6 +116,7 @@ CMDS = AttrDict({
     #'ttt': ['Play Tic Tac Toe!', ['tictactoe'], 'fun'],
 })
 
+CMDS_LIST= list(CMDS)
 CMD_CLASSES= list(sorted(set([CMDS[command][2] for command in CMDS])))
 CLASS_CMDS= {class_: [] for class_ in CMD_CLASSES}
 
@@ -135,7 +136,6 @@ reddit= praw.Reddit(
     user_agent= "Reddit Searching for Savage Cabbage#3666",
     client_id= os.getenv("REDDIT_ID"),
     client_secret= os.getenv("REDDIT_TOKEN"))
-
 imgur_auth= "Client-ID "+ os.getenv("IMGUR_ID")
 
 # Emojis code
@@ -179,13 +179,13 @@ roasts = [
     "There are several people in this world that I find obnoxious and you are **all of them**",
     "Yo mama so is so stupid that she climbed over a glass wall **to see what was behind it**",
     "I would have liked to insult you, but with your intelligence, **it would have been a compliment**",
-    "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. **I think you owe it an apology**"
+    "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. **I think you owe it an apology**",
 ]
 
 # Eightball answers for the 8ball command
 eightball_answers= [
     # Yes
-    "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Duh, of course"
+    "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes - definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Duh, of course", "hella",
     # Maybe
     "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "whaaaaat? y u no *concentrate*?", 
     # No
@@ -205,7 +205,8 @@ for roast in sorted(roasts_no_bold): roasts_str+= f"{roast}\n"
 
 
 
-BOT_VERSION= "v0.3"
+SHARD_COUNT= 5
+BOT_VERSION= "v0.3.5"
 
 # Links and global
 SUPPORT_SERVER_INVITE= "https://discord.gg/AJj45Sj"
