@@ -84,7 +84,7 @@ async def on_message(m: discord.Message):
     global commands_run, commands_run_not_admin, current_status
 
   # Send function
-    #async def send( title, message, footer= None, image= None, thumbnail= None, set_author_img= False,
+    async def send( title, message, footer= None, image= None, thumbnail= None, set_author_img= False,
                     color= discord.Color(random.randint(0, 0xFFFFFF)), fields= {}, channel= m.channel,
                     sendTyping= True):
         if sendTyping:
