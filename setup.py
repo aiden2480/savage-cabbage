@@ -5,6 +5,7 @@ import praw
 import time
 import random
 import discord
+import asyncio
 import traceback
 from datetime import datetime as dt
 
@@ -100,6 +101,34 @@ class AttrDict(dict):
     def __getattr__(self, attr): return self[attr]
     def __setattr__(self, attr, value): self[attr] = value
 
+class SendEmbed:
+    def __init__(self, MessageObject: discord.Message, ClientObject: discord.Client):
+        self.m= MessageObject
+        self.client= ClientObject
+    
+    async def Send( self, title, message, *, footer= None, image= None,
+                    thumbnail= None, set_author_img= False,
+                    color= discord.Color(random.randint(0, 0xFFFFFF)),
+                    fields= {}, channel= None, sendTyping= True):
+        if channel == None: channel = self.m.channel
+
+        if sendTyping:
+            await self.client.send_typing(channel)
+            await asyncio.sleep(0.75)
+
+        embed= discord.Embed(
+            title= title,
+            description= message,
+            color= color,
+        )
+
+        if image: embed.set_image(url= image)
+        if footer: embed.set_footer(text= footer)
+        if thumbnail: embed.set_thumbnail(url= thumbnail)
+        if set_author_img: embed.set_author(name= self.m.author, icon_url= self.m.author.avatar_url)
+        for field in fields: embed.add_field(name= field, value= fields[field])
+        
+        return await self.client.send_message(channel, embed= embed)
 
 # Commands variables
 CMDS = AttrDict({

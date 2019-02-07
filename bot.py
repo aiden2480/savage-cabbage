@@ -79,31 +79,10 @@ async def on_ready():
 
 @client.event # Main event (houses commands)
 async def on_message(m: discord.Message):
-    msg= m.content
     if m.author.bot: return
+    msg, send= m.content, SendEmbed(m, client).Send
     global commands_run, commands_run_not_admin, current_status
 
-  # Send function
-    async def send( title, message, footer= None, image= None, thumbnail= None, set_author_img= False,
-                    color= discord.Color(random.randint(0, 0xFFFFFF)), fields= {}, channel= m.channel,
-                    sendTyping= True):
-        if sendTyping:
-            await client.send_typing(channel)
-            await asyncio.sleep(0.75)
-
-        embed= discord.Embed(
-            title= title,
-            description= message,
-            color= color,
-        )
-
-        if image: embed.set_image(url= image)
-        if footer: embed.set_footer(text= footer)
-        if thumbnail: embed.set_thumbnail(url= thumbnail)
-        if set_author_img: embed.set_author(name= m.author, icon_url= m.author.avatar_url)
-        for field in fields: embed.add_field(name= field, value= fields[field])
-        
-        await client.send_message(channel, embed= embed)
 
   # Commands (must go last because of how it's set up)
     # Command setup vars, return if not command
