@@ -1,38 +1,39 @@
 # Importing #
 import os
+import sys
 import time
 import random
 import discord
 import asyncio
 import requests
-import traceback
 
-# Setup #
+
+# Setup Vars #
 from setup import *
 client = discord.Client(shard_count= SHARD_COUNT)
 
 # Setup Events #
 @client.event # Error handling
 async def on_error(event, args):
-    print(type(args))
     if type(args) == discord.Message:
-        m= args # The error is usually a message so args is usually a discord Message
+        m, tb= args, sys.exc_info() # The error is usually a message so args is usually a discord Message
         devs, admin, total_users, in_support_server= await message_setup(m, client)
-        
-        embed= discord.Embed(
-            title= f"An error occoured during the **{event}** event",
-            description= f"**Message:**\n```{m.content}```",
-            color= 0xFF8C00)
-        
-        for field: content in {
-            "Server": m.server,
-            "Channel": m.channel,
-            "Author": m.auhtor,
-        }: embed.add_field(field, content)
+        embed= discord.Embed(title= f"An error occoured during the **{event}** event", color= 0xFF8C00)
 
-        await client.send_message(discord.Object(542467438004928512), embed= embed)
+        fields= {
+            "Message": [f"```{m.content}```", False],
+            "Error": [f"```py\n{tuple(tb)[0].__name__}: {tb[1]}```", False],
+            "Traceback": [f"```py\n{tb_to_str(tb)}```", True], # Traceback object, need to get str
+            "Author": [m.author, True],
+            "Server": [m.server, True],
+            "Channel": [m.channel, True]}
+        
+        embed.set_thumbnail(url= m.server.icon_url)
+        embed.set_author(name= m.author, icon_url= m.author.avatar_url)
+        for field in fields: embed.add_field(name= field, value= fields[field][0], inline= fields[field][1])
+        await client.send_message(discord.Object(542474215282966549), embed= embed)
         await client.send_message(m.channel, embed= discord.Embed(
-            title= "Oof, an error occoured",
+            title= "💣 Oof, an error occoured 💥",
             description= f"Please [join the support server](https://savage-cabbage.herokuapp.com/server-invite) and tell **{devs[0]}** what happened to help fix this bug",
             color= 0xFFA500,
         ))
@@ -40,20 +41,28 @@ async def on_error(event, args):
 @client.event # Log joining a server
 async def on_server_join(server: discord.Server):
     print(f"Joined a server: {server.name}, members: {server.member_count}")
-    await client.send_message(discord.Object(542474215282966549), embed= discord.Embed(
+    embed= discord.Embed(
         title= "Server join",
-        description= f"Joined **{server.name}** (**{server.member_count}** members)",
-        color= 0x228B22,
-    ))
+        description= f"Joined **{server.name}** (**{server.member_count- 1}** other members)",
+        color= 0x228B22)
+
+    embed.set_thumbnail(url= server.icon_url)
+    embed.add_field(name= "Server Members", value= server.member_count, inline= True)
+    embed.add_field(name= "New Total Servers", value= len(client.servers), inline= True)
+    await client.send_message(discord.Object(542474215282966549), embed= embed)
 
 @client.event # Log leaving a server
 async def on_server_remove(server: discord.Server):
     print(f"Kicked from a server: {server.name}, members: {server.member_count}")
-    await client.send_message(discord.Object(542474215282966549), embed= discord.Embed(
-        title= "Left server",
-        description= f"Kicked from **{server.name}** (**{server.member_count}** members)",
-        color= 0xFF4500,
-    ))
+    embed= discord.Embed(
+        title= "Kicked from server",
+        description= f"Kicked from **{server.name}** (**{server.member_count- 1}** other members)",
+        color= 0xf44e42)
+
+    embed.set_thumbnail(url= server.icon_url)
+    embed.add_field(name= "Server Members", value= server.member_count, inline= True)
+    embed.add_field(name= "New Total Servers", value= len(client.servers), inline= True)
+    await client.send_message(discord.Object(542474215282966549), embed= embed)
 
 # Main Events #
 @client.event # Setup function
@@ -75,8 +84,9 @@ async def on_message(m: discord.Message):
     global commands_run, commands_run_not_admin, current_status
 
   # Send function
-    async def send( title, message, footer= None, image= None, thumbnail= None, set_author_img= False,
-                    fields= {}, channel= m.channel, sendTyping= True):
+    #async def send( title, message, footer= None, image= None, thumbnail= None, set_author_img= False,
+                    color= discord.Color(random.randint(0, 0xFFFFFF)), fields= {}, channel= m.channel,
+                    sendTyping= True):
         if sendTyping:
             await client.send_typing(channel)
             await asyncio.sleep(0.75)
@@ -84,12 +94,13 @@ async def on_message(m: discord.Message):
         embed= discord.Embed(
             title= title,
             description= message,
-            color= discord.Color(random.randint(0, 0xFFFFFF)),
+            color= color,
         )
 
-        if footer: embed.set_footer(text= footer)
         if image: embed.set_image(url= image)
-        if thumbnail: embed.set_thumbnail()
+        if footer: embed.set_footer(text= footer)
+        if thumbnail: embed.set_thumbnail(url= thumbnail)
+        if set_author_img: embed.set_author(name= m.author, icon_url= m.author.avatar_url)
         for field in fields: embed.add_field(name= field, value= fields[field])
         
         await client.send_message(channel, embed= embed)
@@ -107,11 +118,18 @@ async def on_message(m: discord.Message):
         
         if cmd in CMDS:
             print('Command run:', m.author, cmd, " ".join(args))
-            last_5_commands_run.append(f"{m.author}: {m.content}")
-            if len(last_5_commands_run) > 5: last_5_commands_run.pop(0)
-        
-        commands_run += 1
-        if not admin: commands_run_not_admin += 1
+
+            await send("Command run",
+                f"```{msg}```",
+                channel= discord.Object(542961329867063326),
+                color= 0xf9e236,
+                sendTyping= False,
+                set_author_img= True,
+                fields= {"User": m.author, "Server": m.server, "Channel": m.channel}
+            )
+
+            commands_run += 1
+            if not admin: commands_run_not_admin += 1
 
     # General commands
         if cmd in ["help"] + CMDS.help[1]:
@@ -137,9 +155,6 @@ async def on_message(m: discord.Message):
             except KeyError:
                 await send("", "lol that command doesn't exist")
 
-        elif cmd in ['test']:
-            await send('', m.author.nam)
-        
         elif cmd in ["info"] + CMDS.info[1]:
             _ = [time.time() - run_time[1], 'seconds']
             if _[0] >= 86400: _ = [_[0]/86400, 'days']
@@ -147,7 +162,7 @@ async def on_message(m: discord.Message):
             elif _[0] >= 60: _ = [_[0]/60, 'minutes']
             _ = [round(_[0], 3), _[1]]
 
-            await send("🇮 Info :thinking:",
+            await send(":information_source: Info :thinking:",
                 f"Here's the info for **{client.user}**",
                 footer= f"Last restart {_[0]} {_[1]} ago",
                 fields= {
@@ -164,7 +179,7 @@ async def on_message(m: discord.Message):
                 })
 
             if admin:
-                await send('Admin Info', "**Last 5 commands run:**\n"+ '\n'.join([str(i) for i in last_5_commands_run]),
+                await send('Admin Info', "",
                     fields= {
                         "Commands run": commands_run,
                         "Commands not run by a dev": commands_run_not_admin},

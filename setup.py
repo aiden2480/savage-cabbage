@@ -1,20 +1,22 @@
 # Importing
 import os
+import sys
 import praw
 import time
 import random
 import discord
+import traceback
 from datetime import datetime as dt
 
-# Long and slightly complicated code that I probably could but can't be bothered to shorten
-if True: # Yeet I indented it because why not
+# Format time var
+if True:
     _ = str(dt.now())[:19].split()
-    __= _[1] # The time
+    __= _[1]
     _= _[0].split('-')
     _.reverse()
     run_time= (" ".join(["/".join(_), __]), time.time())
 
-# Message setup function
+# Functions
 async def message_setup(m, client):
     _devs = [
         await client.get_user_info(id)
@@ -37,7 +39,6 @@ async def message_setup(m, client):
 
     return _devs, _admin, _total_users, _in_support_server
 
-# Change bot status
 async def change_status(client, dev, *message):
     status = random.choice([
         # Playing
@@ -81,12 +82,26 @@ async def change_status(client, dev, *message):
     
     return status # Type tuple
 
-# Attribute Dictionary function (for accessing values as attributes)
+def tb_to_str(tb: tuple):
+    try:
+        _= ""
+        for line in traceback.TracebackException(
+            type(tb[0]), tb[1], tb[2]
+        ).format(chain= True): _+= line
+        return _
+    except AttributeError: return None
+
+
+# Classes
+class emojis:
+    partyparrot= "<a:partyparrot:538925147634008067>"
+
 class AttrDict(dict):
     def __getattr__(self, attr): return self[attr]
     def __setattr__(self, attr, value): self[attr] = value
 
-# 'cmd': ['Description of help message', [Aliases], classifier]
+
+# Commands variables
 CMDS = AttrDict({
     # General
     'help': ['Your average help message', ['cmds', 'whatsthis'], 'general'],
@@ -125,7 +140,7 @@ for class_ in CMD_CLASSES:
         if CMDS[command][2] == class_:
             CLASS_CMDS[class_].append(command)
 
-# Load .env for local testing
+# Load .env (if locally hosting)
 try:
     import dotenv
     dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
@@ -137,10 +152,6 @@ reddit= praw.Reddit(
     client_id= os.getenv("REDDIT_ID"),
     client_secret= os.getenv("REDDIT_TOKEN"))
 imgur_auth= "Client-ID "+ os.getenv("IMGUR_ID")
-
-# Emojis code
-class emojis:
-    partyparrot= "<a:partyparrot:538925147634008067>"
 
 # Roasts list
 roasts = [
@@ -192,11 +203,9 @@ eightball_answers= [
     "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "Heck no", "u wish", 
 ]
 
-
 # Other variables and data setup
 commands_run= commands_run_not_admin= 0
 roasts_str= ""
-last_5_commands_run= [None]
 
 one_in_what= 15
 greetings= ["Hey", "Yo", "Wassup", "Oi"]
