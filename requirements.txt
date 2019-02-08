@@ -5,8 +5,8 @@ discord.py
 
 # Server
 Flask
-gunicorn
-itsdangerous
 Jinja2
-MarkupSafe
+gunicorn
 Werkzeug
+MarkupSafe
+itsdangerous
