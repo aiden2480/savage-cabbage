@@ -66,7 +66,6 @@ async def on_server_remove(server: discord.Server):
 # Main Events #
 @client.event # Setup function
 async def on_ready():
-    global current_status
     _ = 0
     for server in client.servers:
         for user in server.members:
@@ -74,14 +73,13 @@ async def on_ready():
 
     print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}") # \n\tServer count: {len(client.servers)}\n\tUser count: {_}")
 
-    current_status = await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
+    await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
 
 @client.event # Main event (houses commands)
 async def on_message(m: discord.Message):
     if m.author.bot: return
     msg, send= m.content, SendEmbed(m, client).Send
     global commands_run, commands_run_not_admin, current_status
-
 
   # Commands (must go last because of how it's set up)
     # Command setup vars, return if not command
@@ -108,6 +106,9 @@ async def on_message(m: discord.Message):
 
             commands_run += 1
             if not admin: commands_run_not_admin += 1
+
+    # Test commands
+        
 
     # General commands
         if cmd in ["help"] + CMDS.help[1]:
@@ -253,13 +254,13 @@ async def on_message(m: discord.Message):
     # Fun commands
         elif cmd in ['8ball'] + CMDS['8ball'][1]:
             if args:
-                await send(f':8ball: {m.content} :rabbit2:',
+                await send(f':8ball: {" ".join(args)} :rabbit2:',
                     random.choice(eightball_answers))
             else:
                 await send('', 'What did you want to ask the all-mighty 8ball? (c to cancel)')
                 _ = await client.wait_for_message(author= m.author)
                 if _.content != 'c':
-                    await send(f':8ball: {" ".join(args)} :rabbit2:',
+                    await send(f':8ball: {_.content} :rabbit2:',
                         random.choice(eightball_answers))
 
         elif cmd in ["spr"] + CMDS.spr[1]:
@@ -290,26 +291,26 @@ async def on_message(m: discord.Message):
                 try:
                     if args[0] == m.mentions[0].mention: # Hacking a user
                         if not m.mentions[0].bot: # Hacking a person
-                            _= (("▮▯▯▯", "Finding email address...", "Email", f"{m.mentions[0].name.replace(' ','_')}@{random.choice(hack_emails)}", "❌ Attempt blocked", True),
-                                ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked", True),
-                                ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked", False),
-                                ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data", False))
+                            _= (("▮▯▯▯", "Finding email address...", "Email", f"{m.mentions[0].name.replace(' ','_')}@{random.choice(hack_emails)}", "❌ Attempt blocked"),
+                                ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
+                                ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
+                                ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
                         else: # Hacking a bot
-                            _= (("▮▯▯▯", "Scrambling bot database...", "Database", "Nothing left :smiling_imp:", "❌ Attempt blocked", True),
-                                ("▮▮▯▯", "Changing commands...", "Commands", "Scrambled!", "❌ Attempt blocked", True),
-                                ("▮▮▮▯", "Changing playing status...", "Playing status", "Hacked!", "❌ Attempt blocked", False),
-                                ("▮▮▮▮", "Leaving all servers...", "Servers", "All gone!", "❌ Attempt blocked", False))
+                            _= (("▮▯▯▯", "Scrambling bot database...", "Database", "Nothing left :smiling_imp:", "❌ Attempt blocked"),
+                                ("▮▮▯▯", "Changing commands...", "Commands", "Scrambled!", "❌ Attempt blocked"),
+                                ("▮▮▮▯", "Changing playing status...", "Playing status", "Hacked!", "❌ Attempt blocked"),
+                                ("▮▮▮▮", "Leaving all servers...", "Servers", "All gone!", "❌ Attempt blocked"))
                 except: # Probably str (or error)
-                    _= (("▮▯▯▯", "Finding email address...", "Email", f"{'_'.join(args)}@{random.choice(hack_emails)}", "❌ Attempt blocked", True),
-                        ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked", True),
-                        ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked", False),
-                        ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data", False))
+                    _= (("▮▯▯▯", "Finding email address...", "Email", f"{'_'.join(args)}@{random.choice(hack_emails)}", "❌ Attempt blocked"),
+                        ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
+                        ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
+                        ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
                 
-                for progress, action, short, choice1, choice2, inline in _:
+                for progress, action, short, choice1, choice2 in _:
                     _embed.title, _embed.description= progress, action
                     _msg= await client.edit_message(_msg, embed= _embed)
                     await asyncio.sleep(2)
-                    _embed.add_field(name= short, value= random.choice([choice1, choice1, choice1, choice2]), inline= inline)
+                    _embed.add_field(name= short, value= random.choice([choice1, choice1, choice1, choice2]))
                     _msg= await client.edit_message(_msg, embed= _embed)
                     await asyncio.sleep(2)
                 _embed.title, _embed.description= "Hack complete", f"Finished hacking **{' '.join(args)}**"
