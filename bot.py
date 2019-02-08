@@ -7,7 +7,6 @@ import discord
 import asyncio
 import requests
 
-
 # Setup Vars #
 from setup import *
 client = discord.Client(shard_count= SHARD_COUNT)
@@ -16,7 +15,7 @@ client = discord.Client(shard_count= SHARD_COUNT)
 @client.event # Error handling
 async def on_error(event, args):
     if type(args) == discord.Message:
-        m, tb= args, sys.exc_info() # The error is usually a message so args is usually a discord Message
+        m, _, tb= args, print("An Error occoured!"), sys.exc_info() # The error is usually a message so args is usually a discord Message
         devs, admin, total_users, in_support_server= await message_setup(m, client)
         embed= discord.Embed(title= f"An error occoured during the **{event}** event", color= 0xFF8C00)
 
@@ -34,7 +33,7 @@ async def on_error(event, args):
         await client.send_message(discord.Object(542474215282966549), embed= embed)
         await client.send_message(m.channel, embed= discord.Embed(
             title= "💣 Oof, an error occoured 💥",
-            description= f"Please [join the support server](https://savage-cabbage.herokuapp.com/server-invite) and tell **{devs[0]}** what happened to help fix this bug",
+            description= f"Please [join the support server]({SUPPORT_SERVER_INVITE}) and tell **{devs[0]}** what happened to help fix this bug",
             color= 0xFFA500,
         ))
 
@@ -280,6 +279,42 @@ async def on_message(m: discord.Message):
 
             await send(f':scissors: SPR with {m.author} :newspaper:',
                 f"I chose **{_}** and you chose **{args[0]}**, **{result}**")
+        
+        elif cmd in ["hack"] + CMDS.hack[1]:
+            if args:
+                _embed= discord.Embed(title= "▯▯▯▯", description= "Hacking in progress",
+                    color= discord.Color(random.randint(0, 0xFFFFFF)))
+                _msg = await client.send_message(m.channel, embed= _embed)
+                await asyncio.sleep(2)
+                
+                try:
+                    if args[0] == m.mentions[0].mention: # Hacking a user
+                        if not m.mentions[0].bot: # Hacking a person
+                            _= (("▮▯▯▯", "Finding email address...", "Email", f"{m.mentions[0].name.replace(' ','_')}@{random.choice(hack_emails)}", "❌ Attempt blocked", True),
+                                ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked", True),
+                                ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked", False),
+                                ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data", False))
+                        else: # Hacking a bot
+                            _= (("▮▯▯▯", "Scrambling bot database...", "Database", "Nothing left :smiling_imp:", "❌ Attempt blocked", True),
+                                ("▮▮▯▯", "Changing commands...", "Commands", "Scrambled!", "❌ Attempt blocked", True),
+                                ("▮▮▮▯", "Changing playing status...", "Playing status", "Hacked!", "❌ Attempt blocked", False),
+                                ("▮▮▮▮", "Leaving all servers...", "Servers", "All gone!", "❌ Attempt blocked", False))
+                except: # Probably str (or error)
+                    _= (("▮▯▯▯", "Finding email address...", "Email", f"{'_'.join(args)}@{random.choice(hack_emails)}", "❌ Attempt blocked", True),
+                        ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked", True),
+                        ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked", False),
+                        ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data", False))
+                
+                for progress, action, short, choice1, choice2, inline in _:
+                    _embed.title, _embed.description= progress, action
+                    _msg= await client.edit_message(_msg, embed= _embed)
+                    await asyncio.sleep(2)
+                    _embed.add_field(name= short, value= random.choice([choice1, choice1, choice1, choice2]), inline= inline)
+                    _msg= await client.edit_message(_msg, embed= _embed)
+                    await asyncio.sleep(2)
+                _embed.title, _embed.description= "Hack complete", f"Finished hacking **{' '.join(args)}**"
+                await client.edit_message(_msg, embed= _embed)
+            else: await send("", "Who did you want to hack?")
 
     # Text commands
         elif cmd in ["partyparrot"] + CMDS.partyparrot[1]:

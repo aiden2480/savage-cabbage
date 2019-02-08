@@ -1,13 +1,12 @@
 # Importing
 import os
-import sys
 import praw
 import time
 import random
 import discord
 import asyncio
-import traceback
 from datetime import datetime as dt
+from traceback import TracebackException
 
 # Format time var
 if True:
@@ -86,7 +85,7 @@ async def change_status(client, dev, *message):
 def tb_to_str(tb: tuple):
     try:
         _= ""
-        for line in traceback.TracebackException(
+        for line in TracebackException(
             type(tb[0]), tb[1], tb[2]
         ).format(chain= True): _+= line
         return _
@@ -157,7 +156,7 @@ CMDS = AttrDict({
     # Fun commands
     '8ball': ['Ask the all-mighty, all-knowing 🎱!', [None], 'fun'],
     'spr': ['Play spr!', [None], 'fun'],
-    #'ttt': ['Play Tic Tac Toe!', ['tictactoe'], 'fun'],
+    'hack': ['Hack a fellow discord user, or the FBI', [None], 'fun'],
 })
 
 CMDS_LIST= list(CMDS)
@@ -232,6 +231,8 @@ eightball_answers= [
     "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "Heck no", "u wish", 
 ]
 
+hack_emails = ["icloud.com", "gmail.com", "yahoo.com", "mememail.com", "hotmail.com", "shaggy.org"]
+
 # Other variables and data setup
 commands_run= commands_run_not_admin= 0
 roasts_str= ""
@@ -244,7 +245,7 @@ for roast in sorted(roasts_no_bold): roasts_str+= f"{roast}\n"
 
 
 SHARD_COUNT= 5
-BOT_VERSION= "v0.3.5"
+BOT_VERSION= "v0.3.6"
 
 # Links and global
 SUPPORT_SERVER_INVITE= "https://discord.gg/AJj45Sj"
