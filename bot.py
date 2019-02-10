@@ -2,14 +2,16 @@
 import os
 import sys
 import time
-import random
 import discord
 import asyncio
 import requests
+import random as r
+
 
 # Setup Vars #
 from setup import *
 client = discord.Client(shard_count= SHARD_COUNT)
+
 
 # Setup Events #
 @client.event # Error handling
@@ -22,7 +24,7 @@ async def on_error(event, args):
         fields= {
             "Message": [f"```{m.content}```", False],
             "Error": [f"```py\n{tuple(tb)[0].__name__}: {tb[1]}```", False],
-            "Traceback": [f"```py\n{tb_to_str(tb)}```", True], # Traceback object, need to get str
+            "Traceback": [f"```py\n{tb_to_str(tb)}```", True],
             "Author": [m.author, True],
             "Server": [m.server, True],
             "Channel": [m.channel, True]}
@@ -63,17 +65,13 @@ async def on_server_remove(server: discord.Server):
     embed.add_field(name= "New Total Servers", value= len(client.servers), inline= True)
     await client.send_message(discord.Object(542474215282966549), embed= embed)
 
+
 # Main Events #
 @client.event # Setup function
 async def on_ready():
-    _ = 0
-    for server in client.servers:
-        for user in server.members:
-            _ += 1
-
     print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}") # \n\tServer count: {len(client.servers)}\n\tUser count: {_}")
 
-    await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {random.choice(roasts_no_bold)}"
+    await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {r.choice(roasts_no_bold)}"
 
 @client.event # Main event (houses commands)
 async def on_message(m: discord.Message):
@@ -90,25 +88,19 @@ async def on_message(m: discord.Message):
             else:
                 cmd, args= msg[21:].split()[0].lower(), msg[21:].split()[1:]
         except: return # Not command and prefix is a coincidence
-        devs, admin, total_users, in_support_server= await message_setup(m, client)
+        finally: devs, admin, total_users, in_support_server= await message_setup(m, client)
         
         if cmd in CMDS:
             print('Command run:', m.author, cmd, " ".join(args))
 
-            await send("Command run",
-                f"```{msg}```",
-                channel= discord.Object(542961329867063326),
-                color= 0xf9e236,
-                sendTyping= False,
-                set_author_img= True,
-                fields= {"User": m.author, "Server": m.server, "Channel": m.channel}
-            )
+            await send("Command run", f"```{msg}```", channel= discord.Object(542961329867063326),
+                fields= {"User": m.author, "Server": m.server, "Channel": m.channel},
+                color= 0xf9e236, sendTyping= False, set_author_img= True)
 
             commands_run += 1
             if not admin: commands_run_not_admin += 1
 
     # Test commands
-        
 
     # General commands
         if cmd in ["help"] + CMDS.help[1]:
@@ -185,8 +177,7 @@ async def on_message(m: discord.Message):
                 " - [**Discord Bot List**](https://discordbotlist.com/bots/492873992982757406/upvote)")
 
         elif cmd in ["commands", "cmds"]:
-            #await send("", "Use `$help` for help or see all my commands on my website:")
-            await client.send_message(m.channel, "Use `$help` for help or see all my commands on my website: https://savage-cabbage.herokuapp.com/#cmds")
+            await client.send_message(m.channel, f"Use `$help` for help or see all my commands on my website: {WEBSITE_HOMEPAGE}/#cmds")
 
     # DM commands
         elif cmd in ["suggest"] + CMDS.suggest[1]:
@@ -203,16 +194,16 @@ async def on_message(m: discord.Message):
     # Roast commands
         elif cmd in ["roast"] + CMDS.roast[1]:
             if not args:
-                await send(random.choice(greetings) + " " + m.author.name + ",",
-                    random.choice(roasts))
+                await send(r.choice(greetings) + " " + m.author.name + ",",
+                    r.choice(roasts))
 
             elif args[0].lower() == 'list':
                 await send("You asked for it buddy",
                     roasts_str.replace('\n', '\n\n'))
 
             else:
-                await send(random.choice(greetings) + " " + " ".join(args) + ",",
-                    random.choice(roasts))
+                try: await send(r.choice(greetings) + " " + m.mentions[0].name+ ",", r.choice(roasts))
+                except: await send(r.choice(greetings) + " " + " ".join(args) + ",", r.choice(roasts))
 
     # Meme commands
         elif cmd in ["meme"] + CMDS.meme[1]:
@@ -239,12 +230,12 @@ async def on_message(m: discord.Message):
     
     # Image commands
         elif cmd in ['imgur'] + CMDS.imgur[1]:
-            if not args: args = [random.choice(["memes", "birbs", "doggos"])] # Need to add more topics
+            if not args: args = [r.choice(["memes", "birbs", "doggos"])] # Need to add more topics
             imgur_data= requests.get(f"https://api.imgur.com/3/gallery/r/{args[0]}",
                 headers= {"Authorization": imgur_auth}).json()["data"]
 
             try:
-                imgur_submission= imgur_data[random.randint(1, 99)] # Control selection avaliable
+                imgur_submission= imgur_data[r.randint(1, 99)] # Control selection avaliable
                 await send(imgur_submission["title"],
                     "",
                     image= imgur_submission["link"],
@@ -255,13 +246,13 @@ async def on_message(m: discord.Message):
         elif cmd in ['8ball'] + CMDS['8ball'][1]:
             if args:
                 await send(f':8ball: {" ".join(args)} :rabbit2:',
-                    random.choice(eightball_answers))
+                    r.choice(eightball_answers))
             else:
                 await send('', 'What did you want to ask the all-mighty 8ball? (c to cancel)')
                 _ = await client.wait_for_message(author= m.author)
                 if _.content != 'c':
                     await send(f':8ball: {_.content} :rabbit2:',
-                        random.choice(eightball_answers))
+                        r.choice(eightball_answers))
 
         elif cmd in ["spr"] + CMDS.spr[1]:
             if not args: return await send('', 'lol u need to play from scissors, paper and rock')
@@ -269,7 +260,7 @@ async def on_message(m: discord.Message):
                 return await send('', 'lol u need to play from scissors, paper and rock')
             args[0] = args[0].lower()
 
-            _ = random.choice(['scissors', 'paper', 'rock'])
+            _ = r.choice(['scissors', 'paper', 'rock'])
             args[0] = {'✂': 'scissors', '📰': 'paper', '🗞': 'paper'}[args[0]]
 
             if args[0] == _: result = "It's a tie!"
@@ -284,15 +275,15 @@ async def on_message(m: discord.Message):
         elif cmd in ["hack"] + CMDS.hack[1]:
             if args:
                 _embed= discord.Embed(title= "▯▯▯▯", description= "Hacking in progress",
-                    color= discord.Color(random.randint(0, 0xFFFFFF)))
+                    color= discord.Color(r.randint(0, 0xFFFFFF)))
                 _msg = await client.send_message(m.channel, embed= _embed)
                 await asyncio.sleep(2)
                 
                 try:
                     if args[0] == m.mentions[0].mention: # Hacking a user
                         if not m.mentions[0].bot: # Hacking a person
-                            _= (("▮▯▯▯", "Finding email address...", "Email", f"{m.mentions[0].name.replace(' ','_')}@{random.choice(hack_emails)}", "❌ Attempt blocked"),
-                                ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
+                            _= (("▮▯▯▯", "Finding email address...", "Email", f"{m.mentions[0].name.replace(' ','_')}@{r.choice(hack_emails)}", "❌ Attempt blocked"),
+                                ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (r.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
                                 ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
                                 ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
                         else: # Hacking a bot
@@ -301,8 +292,8 @@ async def on_message(m: discord.Message):
                                 ("▮▮▮▯", "Changing playing status...", "Playing status", "Hacked!", "❌ Attempt blocked"),
                                 ("▮▮▮▮", "Leaving all servers...", "Servers", "All gone!", "❌ Attempt blocked"))
                 except: # Probably str (or error)
-                    _= (("▮▯▯▯", "Finding email address...", "Email", f"{'_'.join(args)}@{random.choice(hack_emails)}", "❌ Attempt blocked"),
-                        ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (random.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
+                    _= (("▮▯▯▯", "Finding email address...", "Email", f"{'_'.join(args)}@{r.choice(hack_emails)}", "❌ Attempt blocked"),
+                        ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (r.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
                         ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
                         ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
                 
@@ -310,7 +301,7 @@ async def on_message(m: discord.Message):
                     _embed.title, _embed.description= progress, action
                     _msg= await client.edit_message(_msg, embed= _embed)
                     await asyncio.sleep(2)
-                    _embed.add_field(name= short, value= random.choice([choice1, choice1, choice1, choice2]))
+                    _embed.add_field(name= short, value= r.choice([choice1, choice1, choice1, choice2]))
                     _msg= await client.edit_message(_msg, embed= _embed)
                     await asyncio.sleep(2)
                 _embed.title, _embed.description= "Hack complete", f"Finished hacking **{' '.join(args)}**"

@@ -11,7 +11,7 @@ log.setLevel(logging.ERROR)
 from setup import (
     CMDS, CMD_CLASSES,
     BOT_INVITE_LINK, SUPPORT_SERVER_INVITE,
-    CLASS_CMDS, run_time,
+    CLASS_CMDS, run_time, WEBSITE_HOMEPAGE,
 )
 
 # Routes
@@ -19,12 +19,14 @@ from setup import (
 def index(): return render_template("index.html",
     cmds= CMDS, cmd_classes= CMD_CLASSES,
     class_cmds= CLASS_CMDS, run_time= run_time[0],
+    website_homepage= WEBSITE_HOMEPAGE,
 )
 
 @web.route('/invite') # Redirect link
 def invite(): return render_template("redirect.html",
     title= "Invite Savage Cabbage",
     redirect= BOT_INVITE_LINK,
+    website_homepage= WEBSITE_HOMEPAGE,
     embed_title= "Invite Savage Cabbage to your server!",
     embed_description= "yay!",
 )
@@ -33,6 +35,7 @@ def invite(): return render_template("redirect.html",
 def server_invite(): return render_template("redirect.html",
     title= "Savage Cabbage Support Server",
     redirect= SUPPORT_SERVER_INVITE,
+    website_homepage= WEBSITE_HOMEPAGE,
     embed_title= "Join Savage Cabbage's support server!",
     embed_description= "Join for help with any of the commands, to report a bug or to use the custom commands!",
 )

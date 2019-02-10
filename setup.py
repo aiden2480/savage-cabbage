@@ -5,6 +5,7 @@ import time
 import random
 import discord
 import asyncio
+#import pyrebase
 from datetime import datetime as dt
 from traceback import TracebackException
 
@@ -181,6 +182,16 @@ reddit= praw.Reddit(
     client_secret= os.getenv("REDDIT_TOKEN"))
 imgur_auth= "Client-ID "+ os.getenv("IMGUR_ID")
 
+# Setup the firebase databse
+#firebase= pyrebase.initialize_app({
+#    "apiKey": os.getenv("FIREBASE_API"),
+#    "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
+#    "databaseURL": os.getenv("FIREBASE_DATABASE_URL"),
+#    "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET"),
+#    "serviceAccount": "token.json"})
+#db= firebase.database()
+
+
 # Roasts list
 roasts = [
     "Heck off!",
@@ -245,8 +256,9 @@ for roast in sorted(roasts_no_bold): roasts_str+= f"{roast}\n"
 
 
 SHARD_COUNT= 5
-BOT_VERSION= "v0.3.6"
+BOT_VERSION= "v0.3.7"
 
 # Links and global
 SUPPORT_SERVER_INVITE= "https://discord.gg/AJj45Sj"
+WEBSITE_HOMEPAGE= "https://savage-cabbage.herokuapp.com"
 BOT_INVITE_LINK= "https://discordapp.com/oauth2/authorize?client_id=492873992982757406&scope=bot&permissions=201641024&response_type=code&redirect_uri=https%3A%2F%2Fsavage-cabbage.herokuapp.com%2Fserver-invite"

@@ -1,6 +1,7 @@
 # Bot
 praw
 asyncio
+Pyrebase
 discord.py
 
 # Server
