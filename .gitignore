@@ -6,4 +6,4 @@ __pycache__/
 
 # My local stuff
 local/
-local_*.py
+local_*.*

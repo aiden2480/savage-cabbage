@@ -1,13 +1,10 @@
 # Bot
 praw
+pillow
 asyncio
-Pyrebase
-discord.py
+git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]
 
 # Server
 Flask
-Jinja2
 gunicorn
 Werkzeug
-MarkupSafe
-itsdangerous

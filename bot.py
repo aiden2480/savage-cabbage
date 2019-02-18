@@ -1,317 +1,126 @@
-# Importing #
 import os
 import sys
 import time
 import discord
-import asyncio
-import requests
+import logging
 import random as r
-
-
-# Setup Vars #
 from setup import *
-client = discord.Client(shard_count= SHARD_COUNT)
+from discord.ext import commands
+
+bot = commands.AutoShardedBot(
+    command_prefix= commands.when_mentioned_or('$'),
+    owner_id= 272967064531238912,
+    case_sensetive= True)
+
+# Setup events
+@bot.event
+async def on_ready():
+    """My async setup function"""
+    
+    await bot.change_presence(activity= discord.Game(name= "bot up!"))
+    print(f'Logged in as {bot.user} ({len(list(bot.get_all_members()))} users across {len(bot.guilds)} guilds)')
+
+    for cog in [
+        "general", "currency"
+    ]: bot.load_extension(f"cogs.{cog}")
+
+    bot.commands_run = bot.non_admin_commands_run = 0
+    bot.admins = [bot.get_user_info(admin) for admin in [
+        272967064531238912,  # Me
+        270138433370849280,  # Jensen
+        297229962971447297,  # Jack
+        499740673424097303,  # Alt
+    ]]
+
+    await bot.get_channel(542961329867063326).send(embed= discord.Embed(
+        title= "Bot restarted",
+        description= get_time(),
+        color= 0x00BFFF))
 
 
-# Setup Events #
-@client.event # Error handling
-async def on_error(event, args):
-    if type(args) == discord.Message:
-        m, _, tb= args, print("An Error occoured!"), sys.exc_info() # The error is usually a message so args is usually a discord Message
-        devs, admin, total_users, in_support_server= await message_setup(m, client)
-        embed= discord.Embed(title= f"An error occoured during the **{event}** event", color= 0xFF8C00)
+# Guild events
+@bot.event
+async def on_guild_join(guild):
+    """Log joining a guild"""
+    
+    embed = discord.Embed(
+        title= "Guild join",
+        color= 0x228B22,
+        description= f"Joined **{guild.name}** (**{guild.member_count- 1}** other members)")
+    
+    embed.set_thumbnail(url= guild.icon_url)
+    embed.add_field(name= "Guild Members", value= guild.member_count)
+    embed.add_field(name= "New Total Guilds", value= len(bot.guilds))
 
-        fields= {
-            "Message": [f"```{m.content}```", False],
-            "Error": [f"```py\n{tuple(tb)[0].__name__}: {tb[1]}```", False],
-            "Traceback": [f"```py\n{tb_to_str(tb)}```", True],
-            "Author": [m.author, True],
-            "Server": [m.server, True],
-            "Channel": [m.channel, True]}
+    await bot.get_channel(542474215282966549).send(embed= embed)
+
+@bot.event
+async def on_guild_remove(guild):
+    """Log leaving a guild"""
+    
+    embed = discord.Embed(
+        title= "Kicked from guild",
+        color= 0xf44e42,
+        description= f"Kicked from **{guild.name}** (**{guild.member_count- 1}** other members)")
+    
+    embed.set_thumbnail(url= guild.icon_url)
+    embed.add_field(name= "Guild Members", value= guild.member_count)
+    embed.add_field(name= "New Total Guilds", value= len(bot.guilds))
+
+    await bot.get_channel(542474215282966549).send(embed= embed)
+
+
+# Message events
+@bot.before_invoke
+async def before_invoke(ctx):
+    """Setup refreshing data"""
+    bot.send = SendEmbed(bot, ctx).Send
+
+@bot.event
+async def on_command(ctx):
+    """Log commands run"""
+    
+    embed = discord.Embed(title= "Command run", description= f"```{ctx.message.content}```", color= 0xf9e236)
+    embed.add_field(name= "User", value= ctx.author)
+    embed.add_field(name= "Channel", value= ctx.channel)
+    embed.add_field(name= "Guild", value= ctx.guild)
+    embed.set_thumbnail(url= ctx.guild.icon_url)
+    embed.set_footer(text= ctx.author, icon_url= ctx.author.avatar_url)
+    await bot.get_channel(542961329867063326).send(embed= embed)
+
+    bot.commands_run += 1
+    if ctx.author not in bot.admins: bot.non_admin_commands_run += 1
+
+
+# Error events
+@bot.event
+async def on_command_error(ctx, error):
+    """Handle errors"""
+    
+    embed = discord.Embed(color = r.randint(0, 0xFFFFFF))
+    no_bypass_cooldown_commands = ['daily']
+    
+    if isinstance(error, commands.CommandOnCooldown):
+        if user_in_support_guild(bot, ctx.message.author):
+            if ctx.command.name not in no_bypass_cooldown_commands: return await ctx.reinvoke()
+            else: embed.title, embed.description= "Slow it down, cmon", str(error)
         
-        embed.set_thumbnail(url= m.server.icon_url)
-        embed.set_author(name= m.author, icon_url= m.author.avatar_url)
-        for field in fields: embed.add_field(name= field, value= fields[field][0], inline= fields[field][1])
-        await client.send_message(discord.Object(542474215282966549), embed= embed)
-        await client.send_message(m.channel, embed= discord.Embed(
+        else: embed.title, embed.description= "Slow it down, cmon", f"{str(error)}\n\n[Join the support guild]({SUPPORT_GUILD_INVITE}) and you won't have to wait!"
+        await ctx.send(embed= embed)
+    
+    else:
+        print(sys.exc_info())
+        
+        embed.title, embed.color= f"An error occoured", 0xFF8C00
+        embed.description= f"**Traceback:**\n```{format_error(error)}```"
+
+        await bot.get_channel(546570094449393665).send(embed= embed)
+
+        await ctx.send(embed= discord.Embed(
             title= "💣 Oof, an error occoured 💥",
-            description= f"Please [join the support server]({SUPPORT_SERVER_INVITE}) and tell **{devs[0]}** what happened to help fix this bug",
-            color= 0xFFA500,
+            description= f"Please [join the support guild]({SUPPORT_GUILD_INVITE}) and tell **{str(bot.get_user_info(272967064531238912))}** what happened to help fix this bug",
+            color= 0xFFA500
         ))
 
-@client.event # Log joining a server
-async def on_server_join(server: discord.Server):
-    print(f"Joined a server: {server.name}, members: {server.member_count}")
-    embed= discord.Embed(
-        title= "Server join",
-        description= f"Joined **{server.name}** (**{server.member_count- 1}** other members)",
-        color= 0x228B22)
 
-    embed.set_thumbnail(url= server.icon_url)
-    embed.add_field(name= "Server Members", value= server.member_count, inline= True)
-    embed.add_field(name= "New Total Servers", value= len(client.servers), inline= True)
-    await client.send_message(discord.Object(542474215282966549), embed= embed)
-
-@client.event # Log leaving a server
-async def on_server_remove(server: discord.Server):
-    print(f"Kicked from a server: {server.name}, members: {server.member_count}")
-    embed= discord.Embed(
-        title= "Kicked from server",
-        description= f"Kicked from **{server.name}** (**{server.member_count- 1}** other members)",
-        color= 0xf44e42)
-
-    embed.set_thumbnail(url= server.icon_url)
-    embed.add_field(name= "Server Members", value= server.member_count, inline= True)
-    embed.add_field(name= "New Total Servers", value= len(client.servers), inline= True)
-    await client.send_message(discord.Object(542474215282966549), embed= embed)
-
-
-# Main Events #
-@client.event # Setup function
-async def on_ready():
-    print(f"\tLogged in as {client.user}\n\tTime run: {run_time[0]}") # \n\tServer count: {len(client.servers)}\n\tUser count: {_}")
-
-    await change_status(client, await client.get_user_info(272967064531238912)) # f"$help |~| Insulting {total_users} users across {len(client.servers)} servers |~| {r.choice(roasts_no_bold)}"
-
-@client.event # Main event (houses commands)
-async def on_message(m: discord.Message):
-    if m.author.bot: return
-    msg, send= m.content, SendEmbed(m, client).Send
-    global commands_run, commands_run_not_admin, current_status
-
-  # Commands (must go last because of how it's set up)
-    # Command setup vars, return if not command
-    if msg.lower().startswith('$') or msg.lower().startswith(client.user.mention):
-        try:
-            if msg.lower().startswith('$'):
-                cmd, args= msg[1:].split()[0].lower(), msg[1:].split()[1:]
-            else:
-                cmd, args= msg[21:].split()[0].lower(), msg[21:].split()[1:]
-        except: return # Not command and prefix is a coincidence
-        finally: devs, admin, total_users, in_support_server= await message_setup(m, client)
-        
-        if cmd in CMDS:
-            print('Command run:', m.author, cmd, " ".join(args))
-
-            await send("Command run", f"```{msg}```", channel= discord.Object(542961329867063326),
-                fields= {"User": m.author, "Server": m.server, "Channel": m.channel},
-                color= 0xf9e236, sendTyping= False, set_author_img= True)
-
-            commands_run += 1
-            if not admin: commands_run_not_admin += 1
-
-    # Test commands
-
-    # General commands
-        if cmd in ["help"] + CMDS.help[1]:
-            if not args:
-                return await send(":tools: Help :gear:",
-                    f"""
-                    Every time a message is sent, there is a one in **{one_in_what}** chance that the messenger will be insulted (Send `$roast list` for the insults)
-                    To prevent a user from being roasted, add `don't roast the roaster` to thier roles
-
-                    Please consider upvoting [here](https://discordbotlist.com/bots/492873992982757406/upvote) (Once per 24 hrs)
-                    """)
-
-            args = [arg.lower() for arg in args]
-            try:
-                _ = ''
-                for alias in CMDS[args[0]][1]:
-                    _ += str(alias)+ ', '
-
-                await send(f":tools: Help for command **{args[0]}** :gear:",
-                    CMDS[args[0]][0],
-                    footer= "Aliases: "+ _[:-2])
-
-            except KeyError:
-                await send("", "lol that command doesn't exist")
-
-        elif cmd in ["info"] + CMDS.info[1]:
-            _ = [time.time() - run_time[1], 'seconds']
-            if _[0] >= 86400: _ = [_[0]/86400, 'days']
-            elif _[0] >= 3600: _ = [_[0]/3600, 'hours']
-            elif _[0] >= 60: _ = [_[0]/60, 'minutes']
-            _ = [round(_[0], 3), _[1]]
-
-            await send(":information_source: Info :thinking:",
-                f"Here's the info for **{client.user}**",
-                footer= f"Last restart {_[0]} {_[1]} ago",
-                fields= {
-                    "Developer :computer:": devs[0],
-                    # "Admins :tickets:": "%s &\n%s" % (devs[1], devs[2]), # Thier names are too long for my poor info message
-                    "Servers :homes:": len(client.servers),
-                    "Total users :busts_in_silhouette:": total_users,
-                    "Version :white_check_mark:": BOT_VERSION,
-                    "Last restart :calendar:": run_time[0],
-                    "Region :earth_asia:": "Australia",
-                    "Code platform :bow_and_arrow:": "GitHub",
-                    "Hosting service :dart:": "Heroku",
-                    "Language :airplane:": "discord.py async\nPython 3.7",
-                })
-
-            if admin:
-                await send('Admin Info', "",
-                    fields= {
-                        "Commands run": commands_run,
-                        "Commands not run by a dev": commands_run_not_admin},
-                    sendTyping= False)
-
-        elif cmd in ["status"] + CMDS.status[1]:
-            await client.send_typing(m.channel)
-            await asyncio.sleep(0.75)
-            if admin and args:  _ = await change_status(client, devs[0], ' '.join(args))
-            else: _ = await change_status(client, devs[0])
-
-            await send('Status changed to **{} {}**'.format({0:'Playing',1:'Streaming',2:'Listening to',3:'Watching'}[_[0]],_[1]),
-                "",
-                footer= "Want to suggest a status? Use $suggest in a DM!",
-                sendTyping= False)
-
-        elif cmd in ["invite"] + CMDS.invite[1]:
-            await send("**:mailbox_with_mail: Invite :homes:**",
-                f"""Invite me to your server [here]({BOT_INVITE_LINK})
-                Join my support server: {SUPPORT_SERVER_INVITE}""")
-
-        elif cmd in ["vote"] + CMDS.vote[1]:
-            await send("**:arrow_up: Upvote links :newspaper2:**",
-                " - [**Discord Bot List**](https://discordbotlist.com/bots/492873992982757406/upvote)")
-
-        elif cmd in ["commands", "cmds"]:
-            await client.send_message(m.channel, f"Use `$help` for help or see all my commands on my website: {WEBSITE_HOMEPAGE}/#cmds")
-
-    # DM commands
-        elif cmd in ["suggest"] + CMDS.suggest[1]:
-            if m.server == None:
-                if args:
-                    await send(f"Suggestion from {m.author}",
-                        f"{m.author.mention}: **{' '.join(args)}**",
-                        channel= discord.Object(502963219879559168))
-
-                    await send( "Suggestion recevied", "kewlio")
-                else: await send('', "Were you going to suggest anything? 🤷‍")
-            else: await send('', 'lol this is a DM command noob')
-
-    # Roast commands
-        elif cmd in ["roast"] + CMDS.roast[1]:
-            if not args:
-                await send(r.choice(greetings) + " " + m.author.name + ",",
-                    r.choice(roasts))
-
-            elif args[0].lower() == 'list':
-                await send("You asked for it buddy",
-                    roasts_str.replace('\n', '\n\n'))
-
-            else:
-                try: await send(r.choice(greetings) + " " + m.mentions[0].name+ ",", r.choice(roasts))
-                except: await send(r.choice(greetings) + " " + " ".join(args) + ",", r.choice(roasts))
-
-    # Meme commands
-        elif cmd in ["meme"] + CMDS.meme[1]:
-            _ = time.time()
-            await client.send_typing(m.channel)
-
-            while True:
-                r_sub = reddit.subreddit("+".join([
-                    #"meirl", "me_irl",
-                    "dankmemes"#, "PrequelMemes",
-                    #"Hmmm", "wholesomememes",
-                    #"MinecraftMemes", "ROBLOXmemes",
-                    #"DeepFriedMemes",
-                ])).random()
-
-                if r_sub.url.endswith(".png") or r_sub.url.endswith(".jpg"):
-                    reddit_embed = discord.Embed(title= r_sub.title)
-                    reddit_embed.set_image(url= r_sub.url)
-                    reddit_embed.set_footer(text= f"⬆ {r_sub.score} 💭 {r_sub.num_comments}")
-
-                    await client.send_message(m.channel, embed= reddit_embed)
-                    break
-                else: continue
-    
-    # Image commands
-        elif cmd in ['imgur'] + CMDS.imgur[1]:
-            if not args: args = [r.choice(["memes", "birbs", "doggos"])] # Need to add more topics
-            imgur_data= requests.get(f"https://api.imgur.com/3/gallery/r/{args[0]}",
-                headers= {"Authorization": imgur_auth}).json()["data"]
-
-            try:
-                imgur_submission= imgur_data[r.randint(1, 99)] # Control selection avaliable
-                await send(imgur_submission["title"],
-                    "",
-                    image= imgur_submission["link"],
-                    footer= f"👀{imgur_submission['views']} 👍{imgur_submission['score']}")
-            except: await send("", "oof, no results :shrug:")
-
-    # Fun commands
-        elif cmd in ['8ball'] + CMDS['8ball'][1]:
-            if args:
-                await send(f':8ball: {" ".join(args)} :rabbit2:',
-                    r.choice(eightball_answers))
-            else:
-                await send('', 'What did you want to ask the all-mighty 8ball? (c to cancel)')
-                _ = await client.wait_for_message(author= m.author)
-                if _.content != 'c':
-                    await send(f':8ball: {_.content} :rabbit2:',
-                        r.choice(eightball_answers))
-
-        elif cmd in ["spr"] + CMDS.spr[1]:
-            if not args: return await send('', 'lol u need to play from scissors, paper and rock')
-            if not args[0].lower() in ['scissors', 'paper', 'rock', '✂', '📰', '🗞']:
-                return await send('', 'lol u need to play from scissors, paper and rock')
-            args[0] = args[0].lower()
-
-            _ = r.choice(['scissors', 'paper', 'rock'])
-            args[0] = {'✂': 'scissors', '📰': 'paper', '🗞': 'paper'}[args[0]]
-
-            if args[0] == _: result = "It's a tie!"
-            elif args[0] == 'scissors' and _ == 'paper': result = 'You win!'
-            elif args[0] == 'paper' and _ == 'rock': result = 'You win!'
-            elif args[0] == 'rock' and _ == 'scissors': result = 'You win!'
-            else: result = 'I win!'
-
-            await send(f':scissors: SPR with {m.author} :newspaper:',
-                f"I chose **{_}** and you chose **{args[0]}**, **{result}**")
-        
-        elif cmd in ["hack"] + CMDS.hack[1]:
-            if args:
-                _embed= discord.Embed(title= "▯▯▯▯", description= "Hacking in progress",
-                    color= discord.Color(r.randint(0, 0xFFFFFF)))
-                _msg = await client.send_message(m.channel, embed= _embed)
-                await asyncio.sleep(2)
-                
-                try:
-                    if args[0] == m.mentions[0].mention: # Hacking a user
-                        if not m.mentions[0].bot: # Hacking a person
-                            _= (("▮▯▯▯", "Finding email address...", "Email", f"{m.mentions[0].name.replace(' ','_')}@{r.choice(hack_emails)}", "❌ Attempt blocked"),
-                                ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (r.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
-                                ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
-                                ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
-                        else: # Hacking a bot
-                            _= (("▮▯▯▯", "Scrambling bot database...", "Database", "Nothing left :smiling_imp:", "❌ Attempt blocked"),
-                                ("▮▮▯▯", "Changing commands...", "Commands", "Scrambled!", "❌ Attempt blocked"),
-                                ("▮▮▮▯", "Changing playing status...", "Playing status", "Hacked!", "❌ Attempt blocked"),
-                                ("▮▮▮▮", "Leaving all servers...", "Servers", "All gone!", "❌ Attempt blocked"))
-                except: # Probably str (or error)
-                    _= (("▮▯▯▯", "Finding email address...", "Email", f"{'_'.join(args)}@{r.choice(hack_emails)}", "❌ Attempt blocked"),
-                        ("▮▮▯▯", "Finding IP address...", "IP Address", ".".join(map(str, (r.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
-                        ("▮▮▮▯", "Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
-                        ("▮▮▮▮", "Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
-                
-                for progress, action, short, choice1, choice2 in _:
-                    _embed.title, _embed.description= progress, action
-                    _msg= await client.edit_message(_msg, embed= _embed)
-                    await asyncio.sleep(2)
-                    _embed.add_field(name= short, value= r.choice([choice1, choice1, choice1, choice2]))
-                    _msg= await client.edit_message(_msg, embed= _embed)
-                    await asyncio.sleep(2)
-                _embed.title, _embed.description= "Hack complete", f"Finished hacking **{' '.join(args)}**"
-                await client.edit_message(_msg, embed= _embed)
-            else: await send("", "Who did you want to hack?")
-
-    # Text commands
-        elif cmd in ["partyparrot"] + CMDS.partyparrot[1]:
-            if args: await send('', str(emojis.partyparrot).join(args))
-            else: await send('', f'What do you want me to {emojis.partyparrot}?')
-
-
-client.run(os.getenv("BOT_TOKEN"))
+bot.run(os.getenv("BOT_TOKEN"))
