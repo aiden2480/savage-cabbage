@@ -10,35 +10,44 @@
 			<img src="/static/icon.jpg" alt="icon" style="width:47.5px;height:47.5px">
 			<a href="#home">Home</a>
 			<a href="#info">Info</a>
-			<a href="#cmds">Commands</a>
-			<a href="#stats">Stats</a>
-			<a href="#contact">Contact</a>
-			<a href="server-invite" target="_blank">Support Server</a>
-			<a href="invite" target="_blank">Invite</a>
-		</div>
-		<br>
+			<a href="#stats">Commands</a>
+			<a href="#cmds">Stats</a>
+			<a href="#links">Links</a>
+			<a href="invite" target="_blank" style="float:right">Invite</a>
+			<a href="server-invite" target="_blank" style="float:right">Support Server</a>
+		</div><br>
 		
+
 		<h1 id="home">Home</h1>
 		<p>Welcome to the official website for <b>Savage Cabbage#3666</b>. Here is a list of all the commands, as well as useful info and links</p>
 
+
 		<h1 id="info">Info</h1>
 		<p>Savage Cabbage was developed by <a href="https://github.com/aiden2480" target="_blank">chocolatejade42</a> and started development on the 22<sup>nd</sup> of September 2018. The last update was <b>{{run_time}}</b> AEST.</p>
+		<p>Use <u>$autoroast</u> in a channel that the bot has access in to get randomly generated quotes, such as this one: <b>{{choice_roast}}</b>.</p>
 		
+
+		<h1 id="stats">Stats</h1>
+		<p>Uptime stats and error logs can be viewed <a href="https://stats.uptimerobot.com/M1NrQcXJv/781037937" target="_blank">here</a>. This only shows stats from the last week though. Update logs and changes can be viewed <a href="logs" target="_blank">here</a>.</p>
+
+
 		<h1 id="cmds">Commands</h1>
-		<p>The different command classes are: <b>{{", ".join(cmd_classes)}}</b></p>
-		<ul>{% for class in cmd_classes %}
+		<p>The various commands include;</p>
+		
+		<!--<ul>{% for class in cmd_classes %}
 			<h4><b>{{class.upper()}} COMMANDS</b></h4>
 			{% for command in class_cmds[class] %}
 			<li>{{command}}: {{cmds[command][0]}}</li>
 			{% endfor %} {% endfor %}
-		</ul>
-
-		<h1 id="stats">Stats</h1>
-		<p>Uptime stats and error logs can be viewed <a href="https://stats.uptimerobot.com/M1NrQcXJv/781037937" target="_blank">here</a>. This only shows stats from the last week though</p>
+		</ul>-->
 		
-		<h1 id="contact">Contact</h1>
+
+		<h1 id="links">Links</h1>
 		<p>Contact the developer(s) by using the <b>$suggest</b> command <i>in a DM</i> or 
 			<a href="server-invite" target="_blank">join the support server</a>.
+		<p>View the bot update logs <a href="logs">here</a> and the source code <a href="{{source_code}}">here</a>.</p>
 		</p>
+
+		<br><p>Here's an inspirational quote from the master: <b>{{choice_roast}}</b></p>
 	</body>
 </html>

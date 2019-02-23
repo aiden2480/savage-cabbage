@@ -18,24 +18,21 @@ class Memey:
     
     @commands.command(aliases= ["reddit"])
     async def meme(self, ctx):
-        _ = time.time()
-        
-    
-    #@commands.command()
-    #async def spongebob1(self, ctx):
-    #    pass
-    
-    #@commands.command()
-    #async def spongebob2(self, ctx, *, text: str):
-    #    im = Image.open('img_templates/spongebob2.jpg')
-    #    d = ImageDraw.Draw(im)
-    #    font = ImageFont.truetype('assets/batmanforever.ttf', 30)
+        await ctx.channel.typing()
 
-    #    d.text((60, 85), '\n'.join(textwrap.wrap(text, 8)), font= font, fill= (100, 100, 200))
-    #    em = discord.Embed(color= r.randint(0, 0xFFFFFF))
+        while True:
+            submission = self.reddit.subreddit("+".join([
+                "dankmemes"
+            ])).random()
 
-    #    em.set_image(io.BytesIO(im))
-    #    await ctx.send(embed= em, file= discord.File(im, 'spongebob.jpg'))
+            if submission.url.endswith(".png") or submission.url.endswith(".jpg"):
+                embed = discord.Embed(title= submission.title)
+                embed.set_image(url= submission.url)
+                embed.set_footer(text= f"⬆ {submission.score} 💭 {submission.num_comments}")
+
+                await ctx.send(embed= embed)
+                break
+            else: continue
 
 
 def setup(bot): bot.add_cog(Memey(bot))

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Savage Cabbage Update log</title>
+        <meta content="Savage Cabbage update logs" property="og:title"><meta content="Latest update: v{{last_update[0]}}: {{last_update[1]}}" property="og:description"><meta content="{{website_homepage}}/static/icon.jpg" property="og:image"><meta name="theme-color" content="#01A300">
+        <link rel="icon" href="/static/icon.jpg"><link rel="stylesheet" type="text/css" href="/static/styling.css"><meta charset="UTF-8"><meta name="author" content="chocolatejade42"><meta name="keywords" content="Discord,SavageCabbage,Python,DiscordPy"><meta name="description" content="Savage Cabbage Discord Bot"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <h1>Savage Cabbage Update log</h1>
+        {% for version in update_log %}
+        <p style="font-size: 22px">v<b>{{version}}</b> - {{update_log[version]}}</p>
+        {% endfor %}
+    </body>
+</html>

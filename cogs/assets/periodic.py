@@ -1,5 +1,4 @@
 import os
-import logging
 import asyncio
 import requests
 
@@ -8,7 +7,6 @@ class DiscordBotsListComAPI:
 
     def __init__(self, bot):
         self.bot = bot
-        self.logger = logging.getLogger('client')
         self.token = os.getenv("DISCORDBOTLIST_TOKEN")
         self.bot.loop.create_task(self.update_stats())
         self.requests = requests
@@ -17,7 +15,6 @@ class DiscordBotsListComAPI:
         """This function runs every 30 minutes to automatically update your server count"""
 
         while True:
-            self.logger.info('Attempting to post server count...')
             try:
                 payload = {
                 'guilds': len(list(self.bot.guilds)), 
@@ -27,12 +24,22 @@ class DiscordBotsListComAPI:
                 r = requests.post(url,  headers= headers, data= payload)
                 print(f'Status code:{r.status_code}')
             except Exception as e: self.logger.exception('Failed to post server count\n{}: {}'.format(type(e).__name__,e))
-            await asyncio.sleep(1800)
+            await asyncio.sleep(1800) # Every 30 minutes
+    
+async def setup_info(bot):
+    """Frequently update stats such as
+    - admin user info
+    """
+    
+    while True:
+        bot.admins = [await bot.get_user_info(admin) for admin in [
+            272967064531238912, # Me
+            297229962971447297, # Jack
+            454928254558535700, # Dana
+        ]]
+    
+        await asyncio.sleep(2700) # Refresh every 45 mins
 
-class DiscordBotsGGAPI:
-    def __init__(self, bot):
-        self.bot = bot
-
-def setup(bot):
-    bot.add_cog(DiscordBotsListComAPI(bot))
-    bot.add_cog(DiscordBotsGGAPI(bot))
+async def setup(bot):
+    bot.loop.create_task(await setup_info(bot))
+    # bot.add_cog(DiscordBotsListComAPI(bot))
