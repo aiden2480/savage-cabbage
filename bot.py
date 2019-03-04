@@ -6,6 +6,7 @@ import requests
 import random as r
 from setup import *
 from discord.ext import commands
+from cogs.assets import webserver
 
 _runtime_ = time.time()
 bot = commands.Bot(
@@ -160,6 +161,5 @@ async def on_command_error(ctx, error):
             await ctx.send(embed= em)
 
 
-#import webserver
-#webserver.start_server()
+webserver.start_server()
 bot.run(os.getenv("BOT_TOKEN"))

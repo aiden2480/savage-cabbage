@@ -1,6 +1,6 @@
 # Flask setup
 import random as r
-import multiprocessing
+import threading
 from discord.ext import commands
 from flask import Flask, send_file, render_template
 web = Flask("Savage Cabbage Website")
@@ -72,6 +72,8 @@ def icon(): return send_file("static/icon.jpg",
 
 
 # Yeet that online!
-def run(): web.run(debug= False)
-def start_server(): multiprocessing.Process(target= run).start()#, daemon= True).start()
-if __name__ == "__main__": web.run(debug= True)
+def run(): web.run(host='0.0.0.0',port=0000)
+def start_server():
+    """Start the webserver to keep this bot online!"""
+    t = threading.Thread(target= run)
+    t.start()
