@@ -20,11 +20,21 @@ from setup import (
     UPDATE_LOG, roasts_no_bold
 )
 
+command_info = {
+    "general": [["help", "stop it, get some help"], ["info", "stats about the bot"], ["suggest", "send a helpful suggestion!"]],
+    
+    "memey": [["meme", "get the freshest memes off reddit"], ["vr", "image manipulation of the classic vr template"], ["spongebob", "just you wait and see"]],
+    
+    "currency": [["daily", "1k coins, once a day"], ["steal", "steal from another user, spoopy"], ["bank", "view the contents of your bank"]],
+}
+
+
 # Web Routes
 @web.route("/") # Static link
-def index(): return render_template("index.html",
+def index(): return render_template("web/templates/index.html",
     run_time= RUN_TIME,
     source_code= SOURCE_CODE,
+    command_info= command_info,
     website_homepage= WEBSITE_HOMEPAGE,
     choice_roast= r.choice(roasts_no_bold)
 )
@@ -62,13 +72,6 @@ def icon(): return send_file("static/icon.jpg",
 
 
 # Yeet that online!
-def run():web.run(debug= True)
-def start_server(BOT):
-    """Start the webserver for the website (this also helps keep the bot online)"""
-    global bot
-    bot = BOT
-
-    multiprocessing.Process(target= run, daemon= True).start()
-
-
+def run(): web.run(debug= False)
+def start_server(): multiprocessing.Process(target= run).start()#, daemon= True).start()
 if __name__ == "__main__": web.run(debug= True)

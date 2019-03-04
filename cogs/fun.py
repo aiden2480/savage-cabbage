@@ -4,7 +4,7 @@ import random as r
 from discord.ext import commands
 from setup import eightball_answers
 
-class Fun:
+class Fun(commands.Cog):
     def __init__(self, bot): self.bot = bot
 
     @commands.cooldown(2, 3)
@@ -26,9 +26,9 @@ class Fun:
     @commands.cooldown(2, 5)
     @commands.command()
     async def spr(self, ctx, option):
-        try: userchoice = {"✂": "scissors", "📰": "paper", "🗞": "paper"}[option.lower()]
+        """Play spr with the bot"""
+        try: userchoice = {"✂": "scissors", "📰": "paper", "🗞": "paper", "scissors": "scissors", "paper": "paper", "rock": "rock"}[option.lower()]
         except KeyError: return await self.bot.send("", "Please use a valid option from **scissors**, **paper**, **rock**, 🗞 and 📰")
-        if userchoice not in ["scissors", "paper", "rock"]: return await self.bot.send("", "Please use a valid option from **scissors**, **paper**, **rock**, 🗞 and 📰")
     
         compchoice = r.choice(["scissors", "paper", "rock"])
         # if userchoice == compchoice: result = "It's a tie!"
@@ -54,6 +54,7 @@ class Fun:
     @commands.command()
     @commands.cooldown(3, 6)
     async def hack(self, ctx, user: discord.User):
+        """Hack a user or bot"""
         progresses = ["▯▯▯▯", "▮▯▯▯", "▮▮▯▯", "▮▮▮▯", "▮▮▮▮"]
         embed = discord.Embed(
             title= progresses[0], description= "Hacking in progress",
@@ -84,6 +85,12 @@ class Fun:
             await asyncio.sleep(2)
         embed.title, embed.description= "Hack complete", f"Finished hacking {user}"
         await msg.edit(embed= embed)
+
+
+    @commands.command()
+    @commands.cooldown(2, 6)
+    async def poll(self, ctx, *, args):
+        pass
 
 
 def setup(bot): bot.add_cog(Fun(bot))

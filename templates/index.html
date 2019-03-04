@@ -17,7 +17,7 @@
 			<a href="server-invite" target="_blank" style="float:right">Support Server</a>
 		</div><br>
 		
-
+		
 		<h1 id="home">Home</h1>
 		<p>Welcome to the official website for <b>Savage Cabbage#3666</b>. Here is a list of all the commands, as well as useful info and links</p>
 
@@ -32,22 +32,19 @@
 
 
 		<h1 id="cmds">Commands</h1>
-		<p>The various commands include;</p>
+		<p>The different command types are: <b>{{", ".join(command_info.keys())}}</b> and thier various commands inclue;</p>
 		
-		<!--<ul>{% for class in cmd_classes %}
+		<ul>{% for class in command_info %}
 			<h4><b>{{class.upper()}} COMMANDS</b></h4>
-			{% for command in class_cmds[class] %}
-			<li>{{command}}: {{cmds[command][0]}}</li>
-			{% endfor %} {% endfor %}
-		</ul>-->
+			{% for command in command_info[class] %}
+				<li>{{command[0]}}: {{command[1]}}</li>
+			{% endfor %}
+		{% endfor %}</ul>
 		
-
+		
 		<h1 id="links">Links</h1>
-		<p>Contact the developer(s) by using the <b>$suggest</b> command <i>in a DM</i> or 
+		<p>Contact the developers by using the <b>$suggest</b> command in a DM or 
 			<a href="server-invite" target="_blank">join the support server</a>.
-		<p>View the bot update logs <a href="logs">here</a> and the source code <a href="{{source_code}}">here</a>.</p>
-		</p>
-
-		<br><p>Here's an inspirational quote from the master: <b>{{choice_roast}}</b></p>
+		<p>View the bot update logs <a href="logs">here</a> and the source code <a href="{{source_code}}">here</a>.</p></p>
 	</body>
 </html>

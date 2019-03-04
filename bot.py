@@ -1,17 +1,18 @@
 import os
 import time
+import json
 import discord
-import logging
+import requests
 import random as r
 from setup import *
 from discord.ext import commands
 
-
-on_ready_run= False
-bot = commands.AutoShardedBot(
-    command_prefix= commands.when_mentioned_or('$', 'sc$'),
+_runtime_ = time.time()
+bot = commands.Bot(
+    command_prefix= prefix,
+    status= discord.Status.idle,
     owner_id= 272967064531238912,
-    case_sensetive= True)
+    activity= discord.Game("Restarting..."))
 
 
 # Setup events
@@ -21,29 +22,30 @@ async def on_ready():
 
     bot.admins = [await bot.get_user_info(admin) for admin in [
         272967064531238912, # Me
-        297229962971447297, # Jack
         454928254558535700, # Dana
+        297229962971447297, # Jack
     ]]
 
-    bot.current_status = await change_status(bot)
-    print(f'Logged in as {bot.user} ({len(list(bot.get_all_members()))} users across {len(bot.guilds)} guilds)')
 
-
-    bot.commands_run = bot.non_admin_commands_run = 0
-    bot.initial_cogs = [
+    bot.commands_run, bot.non_admin_commands_run, bot.initial_cogs = 0, 0, [
         "general", "fun", "currency",
-        "memey", "text", "admin",
+        "memey", "text", "admin", "imagecog", "config"
     ]
     
 
-    bot.remove_command("help")
+    # bot.remove_command("help")
     bot.no_bypass_cooldown_commands = ["daily"]
-    for cog in bot.initial_cogs: bot.load_extension(f"cogs.{cog}")
+    for cog in bot.initial_cogs:
+        try: bot.load_extension(f"cogs.{cog}")
+        except Exception as e:
+            print(f"Could not load cog {cog}: {e}")
+            await bot.get_channel(546570094449393665).send(f"{bot.admins[0].mention}, cog **{cog}** could not be loaded", embed= discord.Embed(description= f"```py\n{e}```", color= r.randint(0, 0xFFFFFF)))
 
-    if bot.user.id == 492873992982757406: await bot.get_channel(542961329867063326).send(embed= discord.Embed(
-        title= "Bot restarted",
-        description= get_time(),
-        color= 0x00BFFF))
+
+    bot.current_status = await change_status(bot)
+    bot.serverprefixes = json.loads(requests.get(os.getenv("DATABASE_URL")+"/server-prefixes").text)["result"] # Change from requests though this first time might be ok
+    print(f"Logged in as {bot.user} - {len(list(bot.get_all_members()))} users across {len(bot.guilds)} guilds - Loaded in {round(time.time()- _runtime_, 2)} seconds")
+    if bot.user.id == 492873992982757406: await bot.get_channel(542961329867063326).send(embed= discord.Embed(title= "Bot restarted", description= f"Loaded in {round(time.time()- _runtime_, 2)} seconds\n\nRestarted: {get_time()}", color= 0x00BFFF))
 
 
 # Guild events
@@ -81,7 +83,7 @@ async def on_guild_remove(guild):
 # Message events
 @bot.before_invoke
 async def before_invoke(ctx):
-    """Setup refreshing data"""
+    """Setup command-based refreshing data"""
     bot.send = SendEmbed(ctx).Send
 
 @bot.event
@@ -92,12 +94,22 @@ async def on_command(ctx):
     embed.add_field(name= "User", value= ctx.author)
     embed.add_field(name= "Channel", value= ctx.channel)
     embed.add_field(name= "Guild", value= ctx.guild)
-    embed.set_thumbnail(url= ctx.guild.icon_url)
+    if ctx.guild: embed.set_thumbnail(url= ctx.guild.icon_url)
     embed.set_footer(text= ctx.author, icon_url= ctx.author.avatar_url)
     await bot.get_channel(542961329867063326).send(embed= embed)
 
     bot.commands_run += 1
+    print(f"Command run: {ctx.author}: {ctx.message.content}")
     if ctx.author not in bot.admins: bot.non_admin_commands_run += 1
+
+@bot.event
+async def on_message(m):
+    if m.author == bot.user: return
+    #if m.author.id in bot.database["banlist"]: return
+
+    if m.content == "no u": await m.channel.send("no u")
+
+    await bot.process_commands(m)
 
 
 # Error events
@@ -106,44 +118,48 @@ async def on_command_error(ctx, error):
     """Handle errors"""
     
     embed = discord.Embed(color = r.randint(0, 0xFFFFFF))
+    ignored_errors = (commands.NotOwner)
     missing_param_errors = (commands.MissingRequiredArgument, commands.BadArgument, commands.TooManyArguments, commands.UserInputError)
     
-    if isinstance(error, commands.NotOwner):
-        embed.title, embed.description= "Owner only command! :stop_button:", f"Lol I don't even know how you found this command but good job {emojis.thinkok}"
 
-        await ctx.send(embed= embed)
-
-    elif isinstance(error, commands.CommandOnCooldown):
-        if user_in_support_guild(bot, ctx.message.author):
-            if ctx.command.name not in bot.no_bypass_cooldown_commands: return await ctx.reinvoke()
-            else: embed.title, embed.description= "Slow it down, cmon", str(error)
-        
-        else: embed.title, embed.description= "Slow it down, cmon", f"{str(error)}\n\n[Join the support guild]({SUPPORT_GUILD_INVITE}) and you won't have to wait!"
-        await ctx.send(embed= embed)
-    
+    if isinstance(error, ignored_errors):
+        pass
     elif isinstance(error, missing_param_errors):
         await ctx.send(embed= discord.Embed(
             color= r.randint(0, 0xFFFFFF),
             title= "Incorrect usage of command",
-            description= f"This is the correct usage:\n**{ctx.prefix}{ctx.command.signature}**"
+            description= f"{str(error)}\n\nThis is the correct usage: **{ctx.prefix}{ctx.command.signature}**"
         ))
-    
     elif isinstance(error, commands.CommandNotFound):
-        await ctx.send(f"thats not a command lol {emojis.partyparrot}")
-
-    else:        
+        if ctx.guild != None: # DM commands don't need prefix
+            await ctx.send(f"thats not a command lol {emojis.partyparrot}")
+    elif isinstance(error, commands.NoPrivateMessage):
+        await ctx.send("oof, this is a `guild-only` command!")
+    elif isinstance(error, commands.CommandOnCooldown):
+        if user_in_support_guild(bot, ctx.message.author):
+            if ctx.command.name not in bot.no_bypass_cooldown_commands: return await ctx.reinvoke()
+            else: embed.title, embed.description= "Slow it down, cmon thats not fair", str(error)
+        
+        else: embed.title, embed.description= "Slow it down, cmon thats not fair", f"{str(error)}\n\n[Join the support guild]({SUPPORT_GUILD_INVITE}) and you won't have to wait!"
+        await ctx.send(embed= embed)
+    else:
         embed.title, embed.color= f"An error occoured", 0xFF8C00
         embed.description= f"**Traceback:**\n```py\n{format_error(error)}```"
 
-        await bot.get_channel(546570094449393665).send(embed= embed)
+        em= discord.Embed(
+            color= 0xFFA500,
+            title= "💣 Oof, an error occoured 💥",
+            description= f"Please [join the support guild]({SUPPORT_GUILD_INVITE}) and tell **{bot.admins[0]}** what happened to help fix this bug")
+        em.set_footer(text= "< Look for this guy!", icon_url= bot.admins[0].avatar_url)
+        
+        
+        if ctx.author == bot.admins[0] and ctx.guild is None:
+            await ctx.send(embed= embed)
+        else:
+            await bot.get_channel(546570094449393665).send(embed= embed)
+            await ctx.send(embed= em)
 
-        embed.color, embed.title, embed.description = 0xFFA500, "💣 Oof, an error occoured 💥", \
-            f"Please [join the support guild]({SUPPORT_GUILD_INVITE}) and tell **{bot.admins[0]}** what happened to help fix this bug"
-        embed.set_footer(text= "< Look for this guy!", icon_url= bot.admins[0].avatar_url)
 
-        await ctx.send(embed= embed)
-
-
-# import webserver
-# webserver.start_server(bot)
+#import webserver
+#webserver.start_server()
 bot.run(os.getenv("BOT_TOKEN"))

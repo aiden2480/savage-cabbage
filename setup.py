@@ -1,10 +1,12 @@
 import os
+import time
 import asyncio
 import discord
+import aiohttp
 import datetime
-import random as r
-# from traceback import TracebackException
 import traceback
+import random as r
+from discord.ext import commands
 
 
 # Load env for local testing
@@ -38,12 +40,24 @@ class SendEmbed:
 class emojis:
     # Non animated
     thinkok= "<:savagethinkok:547987410357846040>"
+    coin= "<:coin:551663295799492611>"
 
     # Animated
     partyparrot= "<a:savagepartyparrot:538925147634008067>"
 
 
 # Functions
+async def prefix(bot, message):
+    """No prefix needed for DM's"""
+    prefixes= ["$"] # For Savage Cabbage
+    if bot.user.id == 499721180379349016: prefixes= ["-"] # Savage Cabbage Beta
+    if message.guild:
+        try: prefixes = [bot.serverprefixes[str(message.guild.id)]]
+        except KeyError: pass # No custom prefix
+    if message.guild is None: prefixes.append("") # DM doesn't need prefix
+    
+    return commands.when_mentioned_or(*prefixes)(bot, message)
+
 def tb_to_str(tb):
     """Takes a traceback and turns it into a string"""
     _= ""
@@ -63,6 +77,7 @@ def get_time():
     return f"{date} {time}"
 
 async def change_status(bot, *, type_text: tuple = None):
+    """Change the bot's playing status"""
     if type_text == None: type_text= r.choice([
         # Playing
         (0, "Tetris"),
@@ -77,7 +92,7 @@ async def change_status(bot, *, type_text: tuple = None):
         (1, "(づ￣ ³￣)づ"),
         (1, "(╯°□°）╯︵ ┻━┻"),
         (1, "┬─┬ ノ( ゜-゜ノ)"),
-        (1, "╭∩╮（︶︿︶）╭∩╮"),
+        # (1, "╭∩╮（︶︿︶）╭∩╮"),
         (1, "┻━┻ ︵ ＼( °□° )／ ︵ ┻━┻"),
 
         # Listening to
@@ -92,6 +107,7 @@ async def change_status(bot, *, type_text: tuple = None):
         (3, f"{bot.admins[0]} code!"),
     ])
 
+    type_text = (int(type_text[0]), type_text[1])
     if type_text[0] == 0: await bot.change_presence(activity= discord.Game(name= type_text[1]))
     if type_text[0] == 1: await bot.change_presence(activity= discord.Streaming(name= type_text[1], url= "https://twitch.tv/chocolatejade42"))
     if type_text[0] == 2: await bot.change_presence(activity= discord.Activity(type= discord.ActivityType.listening, name= type_text[1]))
@@ -99,27 +115,33 @@ async def change_status(bot, *, type_text: tuple = None):
 
     return type_text
 
+async def aiohttpget(url):
+    """GET a url via non-blocking aiohttp"""
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            return await response.text()
 
 # Lambdas
+random_colour = lambda: r.randint(0, 0xFFFFFF)
 user_in_support_guild = lambda bot, user: user in bot.get_guild(496081601755611137).members
 format_error = lambda error: "\n".join(traceback.format_exception(type(error), error, error.__traceback__, 10))
 
 
 # Logs
-UPDATE_LOG= {
+UPDATE_LOG = {
     "0.0.3": "yayeet",
     "0.0.2": "no u",
-    "0.0.1": "Start development",
+    "0.0.1": "Start development"
 }
 
 
 # Variables
-RUN_TIME= get_time()
-VERSION= list(UPDATE_LOG)[0]
-SUPPORT_GUILD_INVITE= "https://discord.gg/AJj45Sj"
-BOT_INVITE_LINK= "https://invite.com/savage-cabbage"
-SOURCE_CODE= "https://github.com/aiden2480/savage-cabbage"
-WEBSITE_HOMEPAGE= "https://savage-cabbage.chocolatejade42.repl.co"
+RUN_TIME = get_time()
+VERSION = list(UPDATE_LOG)[0]
+SOURCE_CODE = "https://github.com/aiden2480/savage-cabbage"
+SUPPORT_GUILD_INVITE = SUPPORT_SERVER_INVITE = "https://discord.gg/AJj45Sj"
+WEBSITE_HOMEPAGE = "https://savage-cabbage.chocolatejade42.repl.co" # "https://savage-cabbage.herokuapp.com"
+BOT_INVITE_LINK = discord.utils.oauth_url(492873992982757406, permissions= discord.Permissions(201641024), redirect_uri= SUPPORT_GUILD_INVITE)
 
 
 # Long lists
@@ -159,8 +181,7 @@ roasts = [
     "There are several people in this world that I find obnoxious and you are **all of them**",
     "Yo mama so is so stupid that she climbed over a glass wall **to see what was behind it**",
     "I would have liked to insult you, but with your intelligence, **it would have been a compliment**",
-    "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. **I think you owe it an apology**",
-]
+    "Somewhere out there is a tree, tirelessly producing oxygen so you can breathe. **I think you owe it an apology**"]
 
 eightball_answers= [
     # Yes
@@ -168,14 +189,16 @@ eightball_answers= [
     # Maybe
     "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "whaaaaat? y u no *concentrate*?", 
     # No
-    "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "Heck no", "u wish", 
-]
+    "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "Heck no", "u wish"]
 
-hack_emails = ["icloud.com", "gmail.com", "yahoo.com", "mememail.com", "hotmail.com", "shaggy.org"]
+hack_emails = [
+    "icloud.com", "gmail.com", "yahoo.com",
+    "mememail.com", "hotmail.com", "shaggy.org"]
 
 # Other variables and data setup
-roasts_str= ""
-one_in_what= 15
-greetings= ["Hey", "Yo", "Wassup", "Oi"]
-roasts_no_bold= [roast.replace("**", "") for roast in roasts]
-for roast in sorted(roasts_no_bold, key= len): roasts_str+= f"{roast}\n"
+roasts_str = ""
+one_in_what = 15
+greetings = ["Hey", "Yo", "Wassup", "Oi"]
+roasts_no_bold = [roast.replace("**", "") for roast in roasts]
+for roast in sorted(roasts_no_bold, key= len): roasts_str += f"{roast}\n"
+_runtime_ = time.time()
