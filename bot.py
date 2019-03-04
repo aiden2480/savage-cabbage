@@ -31,7 +31,7 @@ async def on_ready():
 
     bot.commands_run, bot.non_admin_commands_run, bot.initial_cogs = 0, 0, [
         "general", "fun", "currency",
-        "memey", "text", "admin", "imagecog", "config"
+        "memey", "text", "admin", "image", "config"
     ]
     
 
@@ -83,11 +83,11 @@ async def on_guild_remove(guild):
 
 
 # Message events
-@bot.before_invoke
+'''@bot.before_invoke
 async def before_invoke(ctx):
     """Setup command-based refreshing data"""
     bot.send = SendEmbed(ctx).Send
-
+'''
 @bot.event
 async def on_command(ctx):
     """Log commands run"""
