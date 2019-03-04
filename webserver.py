@@ -72,8 +72,10 @@ def icon(): return send_file("static/icon.jpg",
 
 
 # Yeet that online!
-def run(): web.run(host='0.0.0.0',port=0000)
+def run(): web.run(host= '0.0.0.0', port= 0000)
 def start_server():
     """Start the webserver to keep this bot online!"""
     t = threading.Thread(target= run)
     t.start()
+
+if __name__ == "__main__": web.run(debug= True)

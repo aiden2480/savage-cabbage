@@ -142,6 +142,7 @@ SOURCE_CODE = "https://github.com/aiden2480/savage-cabbage"
 SUPPORT_GUILD_INVITE = SUPPORT_SERVER_INVITE = "https://discord.gg/AJj45Sj"
 WEBSITE_HOMEPAGE = "https://savage-cabbage.chocolatejade42.repl.co" # "https://savage-cabbage.herokuapp.com"
 BOT_INVITE_LINK = discord.utils.oauth_url(492873992982757406, permissions= discord.Permissions(201641024), redirect_uri= SUPPORT_GUILD_INVITE)
+# Permissions: add_reactions, attach_files, change_nickname, embed_links, external_emojis, manage_nicknames, read_messages, send_messages
 
 
 # Long lists

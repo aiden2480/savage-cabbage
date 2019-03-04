@@ -3,17 +3,18 @@ import time
 import json
 import discord
 import requests
+import webserver
 import random as r
 from setup import *
 from discord.ext import commands
-from cogs.assets import webserver
+
 
 _runtime_ = time.time()
 bot = commands.Bot(
     command_prefix= prefix,
     status= discord.Status.idle,
     owner_id= 272967064531238912,
-    activity= discord.Game("Restarting..."))
+    activity= discord.Game(name= "Restarting..."))
 
 
 # Setup events
@@ -161,5 +162,5 @@ async def on_command_error(ctx, error):
             await ctx.send(embed= em)
 
 
-webserver.start_server()
+webserver.start_server() # Implement bot in here too somehow
 bot.run(os.getenv("BOT_TOKEN"))

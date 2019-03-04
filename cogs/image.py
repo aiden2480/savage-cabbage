@@ -8,7 +8,7 @@ from discord.ext import commands
 from PIL import Image, ImageDraw, ImageFont
 
 
-class ImageCog(commands.Cog):
+class Image(commands.Cog):
     def __init__(self, bot: commands.Bot): self.bot, self.session= bot, aiohttp.ClientSession(loop= bot.loop)
 
     async def get_avatar(self, user: Union[discord.User, discord.Member]) -> bytes:
@@ -85,4 +85,4 @@ class ImageCog(commands.Cog):
     """     
 
 
-def setup(bot): bot.add_cog(ImageCog(bot))
+def setup(bot): bot.add_cog(Image(bot))
