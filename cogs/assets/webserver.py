@@ -31,7 +31,7 @@ command_info = {
 
 # Web Routes
 @web.route("/") # Static link
-def index(): return render_template("web/templates/index.html",
+def index(): return render_template("index.html",
     run_time= RUN_TIME,
     source_code= SOURCE_CODE,
     command_info= command_info,
