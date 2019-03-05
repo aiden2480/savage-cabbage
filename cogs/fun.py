@@ -2,7 +2,7 @@ import discord
 import asyncio
 import random as r
 from discord.ext import commands
-from setup import eightball_answers
+from setup import eightball_answers, hack_emails
 
 class Fun(commands.Cog):
     def __init__(self, bot): self.bot = bot
@@ -59,11 +59,11 @@ class Fun(commands.Cog):
         embed = discord.Embed(
             title= progresses[0], description= "Hacking in progress",
             color= discord.Color(r.randint(0, 0xFFFFFF)))
-        msg = ctx.send(embed= embed)
+        msg = await ctx.send(embed= embed)
         await asyncio.sleep(2)
 
         if not user.bot: data = (
-            ("Finding email address...", "Email", f"{m.mentions[0].name.replace(' ','_')}@{r.choice(hack_emails)}", "❌ Attempt blocked"),
+            ("Finding email address...", "Email", f"{user.name.replace(' ','_')}@{r.choice(hack_emails)}", "❌ Attempt blocked"),
             ("Finding IP address...", "IP Address", ".".join(map(str, (r.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
             ("Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
             ("Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
