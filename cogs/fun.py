@@ -2,7 +2,7 @@ import discord
 import asyncio
 import random as r
 from discord.ext import commands
-from setup import eightball_answers, hack_emails
+from setup import eightball_answers
 
 class Fun(commands.Cog):
     def __init__(self, bot): self.bot = bot
@@ -31,11 +31,6 @@ class Fun(commands.Cog):
         except KeyError: return await self.bot.send("", "Please use a valid option from **scissors**, **paper**, **rock**, 🗞 and 📰")
     
         compchoice = r.choice(["scissors", "paper", "rock"])
-        # if userchoice == compchoice: result = "It's a tie!"
-        # if userchoice == "scissors" and compchoice == "paper": result = "You win!"
-        # if userchoice == "paper" and compchoice == "rock": result = "You win!"
-        # if userchoice == "rock" and compchoice == "scissors": result = "You win!"
-        # else: result = "I win!"
         
         if userchoice == compchoice: result = "It's a tie!"
         if (userchoice == "scissors" and compchoice == "paper") or \
@@ -44,7 +39,7 @@ class Fun(commands.Cog):
                     result = "You win!"
         else: result = "I win!"
 
-        await ctx.send(discord.Embed(
+        await ctx.send(embed= discord.Embed(
             color= r.randint(0, 0xFFFFFF),
             title= f":scissors: SPR with {ctx.author} :newspaper:",
             description= f"I chose **{compchoice}** and you chose **{userchoice}**, **{result}**",
@@ -54,8 +49,15 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.cooldown(3, 6)
     async def hack(self, ctx, user: discord.User):
-        """Hack a user or bot"""
+        """Hack a user or bot (Why does everyone have russian passwords???)"""
         progresses = ["▯▯▯▯", "▮▯▯▯", "▮▮▯▯", "▮▮▮▯", "▮▮▮▮"]
+        emails = ["icloud.com", "gmail.com", "yahoo.com", "mememail.com", "hotmail.com", "shaggy.org"]
+        passwords = [
+            "vizaVilE", "lafozhiy", "oLyabAZh", "zhudyury", "miStotyA", "azHutimi", "nyAvapiG", "lihAepeT", "bzhuvedi", "ktipuvOR",
+            "chuAzhTe", "tigoSokE", "kiloCHup", "tuVVtIaZ", "nyuRYAhu", "lyutDyuH", "vaboorma", "obschami", "IvoTsuzh", "duSchuOt",
+            "lebiloch", "gurEliZH", "Shpizhzy", "shIzerUr", "holologi", "etyaRodV", "schaNIpe", "zumYANii", "nyanusch", "sugonoyu",
+            "loRozyat", "helEzYUm", "dYuoscHi", "koGasAte", "tsaMarit", "saanturu", "edizEsor", "DefenUts", "bivYAoTk", "puNOroen",
+            "dOpivogi", "motiveny", "SchatyUn", "chuNyApi", "pishoGaF", "HohoGAsy", "nyunisch", "hevoVomi", "votsisch", "TochaEgu"]
         embed = discord.Embed(
             title= progresses[0], description= "Hacking in progress",
             color= discord.Color(r.randint(0, 0xFFFFFF)))
@@ -63,9 +65,9 @@ class Fun(commands.Cog):
         await asyncio.sleep(2)
 
         if not user.bot: data = (
-            ("Finding email address...", "Email", f"{user.name.replace(' ','_')}@{r.choice(hack_emails)}", "❌ Attempt blocked"),
+            ("Finding email address...", "Email", f"{user.name.replace(' ','_')}@{r.choice(emails)}", "❌ Attempt blocked"),
             ("Finding IP address...", "IP Address", ".".join(map(str, (r.randint(0, 255) for _ in range(4)))), "❌ Attempt blocked"),
-            ("Collecting passwords...", "Password", "||ShAggy_15_G0d||", "❌ Attempt blocked"),
+            ("Collecting passwords...", "Password", f"||{r.choice(passwords)}||", f"||{r.choice(passwords)}||"), # Always gets user password
             ("Selling data to facebook...", "Facebook", "Data sold! :dollar:", "❌ Insignificant data"))
         else: data = (
             ("Scrambling bot database...", "Database", "Nothing left :smiling_imp:", "❌ Attempt blocked"),
@@ -87,10 +89,10 @@ class Fun(commands.Cog):
         await msg.edit(embed= embed)
 
 
-    @commands.command()
-    @commands.cooldown(2, 6)
-    async def poll(self, ctx, *, args):
-        pass
+    #@commands.command()
+    #@commands.cooldown(2, 6)
+    #async def poll(self, ctx, *, args):
+    #    pass
 
 
 def setup(bot): bot.add_cog(Fun(bot))

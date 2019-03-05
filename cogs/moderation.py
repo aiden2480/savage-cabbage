@@ -5,7 +5,7 @@ import json_store_client
 from setup import emojis
 from discord.ext import commands
 
-class Config(commands.Cog):
+class Moderation(commands.Cog):
     def __init__(self, bot): self.bot, self.db = bot, json_store_client.Client(os.getenv("DATABASE_URL"))
 
     @commands.guild_only()
@@ -32,4 +32,4 @@ class Config(commands.Cog):
         await ctx.send("no u")
 
 
-def setup(bot): bot.add_cog(Config(bot))
+def setup(bot): bot.add_cog(Moderation(bot))

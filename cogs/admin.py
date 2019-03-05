@@ -2,7 +2,6 @@ import time
 import inspect
 import discord
 import random as r
-from inspect import getsource
 from discord.ext import commands
 
 class Admin(commands.Cog):
@@ -32,6 +31,26 @@ class Admin(commands.Cog):
             raise e
 
     
+    @commands.is_owner()
+    @commands.command(hidden= True)
+    async def enable(self, ctx, command):
+        try:
+            cmd = self.bot.get_command(command)
+            cmd.enabled= True
+            await ctx.send(embed= discord.Embed(description= "Command enabled! ✅", color= r.randint(0, 0xFFFFFF)))
+        except AttributeError: await ctx.send(embed= discord.Embed(description= "Command not found ❎"))
+
+
+    @commands.is_owner()
+    @commands.command(hidden= True)
+    async def disable(self, ctx, command):
+        try:
+            cmd = self.bot.get_command(command)
+            cmd.enabled= False
+            await ctx.send(embed= discord.Embed(description= f"Command **{cmd}** disabled! ✅", color= r.randint(0, 0xFFFFFF)))
+        except AttributeError: await ctx.send(embed= discord.Embed(description= "Command not found ❎"))
+
+
     @commands.is_owner()
     @commands.command(hidden= True)
     async def reload(self, ctx, cog= None):
@@ -128,8 +147,8 @@ class Admin(commands.Cog):
     async def source(self, ctx, command):
         """Get the command source"""
         cmd = self.bot.get_command(command)
-        if cmd is None: return await self.bot.send("", "Could not find that command :x:")
-        await ctx.send(f"Here ya go\n```{getsource(ctx.callback)}```")
+        if cmd is None: return await self.bot.send("", "Could not find that command ❎")
+        await ctx.send(f"**Here ya go**```py\n{inspect.getsource(cmd.callback)}```")
     
 
     @commands.is_owner()
@@ -154,5 +173,6 @@ class Admin(commands.Cog):
         embed.description = "Cya! :wave:"
         await msg.edit(embed= embed)
         await self.bot.logout()
+
 
 def setup(bot): bot.add_cog(Admin(bot))

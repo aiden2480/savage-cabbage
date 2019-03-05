@@ -192,9 +192,6 @@ eightball_answers= [
     # No
     "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful.", "Heck no", "u wish"]
 
-hack_emails = [
-    "icloud.com", "gmail.com", "yahoo.com",
-    "mememail.com", "hotmail.com", "shaggy.org"]
 
 # Other variables and data setup
 roasts_str = ""

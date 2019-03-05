@@ -1,9 +1,9 @@
 # Flask setup
-import random as r
+import flask
 import threading
+import random as r
 from discord.ext import commands
-from flask import Flask, send_file, render_template
-web = Flask("Savage Cabbage Website")
+web = flask.Flask("Savage Cabbage Website")
 
 # Logging setup
 import logging
@@ -31,24 +31,35 @@ command_info = {
 
 # Web Routes
 @web.route("/") # Static link
-def index(): return render_template("index.html",
-    run_time= RUN_TIME,
-    source_code= SOURCE_CODE,
-    command_info= command_info,
-    website_homepage= WEBSITE_HOMEPAGE,
-    choice_roast= r.choice(roasts_no_bold)
+def index():
+    # print(bot.cogs)
+    command_info= {}
+    for cog in bot.cogs:
+        command_info[cog]= []
+        for cmd in cog.get_commands():
+            if not cmd.hidden and cmd.enabled:
+                command_info[cog].append([cmd.name, cmd.help])
+    
+    return flask.render_template("index.html",
+        bot= bot,
+        run_time= RUN_TIME,
+        source_code= SOURCE_CODE,
+        command_info= command_info,
+        website_homepage= WEBSITE_HOMEPAGE,
+        choice_roast= r.choice(roasts_no_bold),
+        bot_stats= (len(list(bot.get_all_members())), len(bot.guilds)),
 )
 
 @web.route("/log")
 @web.route("/logs")
-def logs(): return render_template("logs.html",
+def logs(): return flask.render_template("logs.html",
     website_homepage= WEBSITE_HOMEPAGE,
     update_log= UPDATE_LOG,
     last_update= (list(UPDATE_LOG)[0], UPDATE_LOG[list(UPDATE_LOG)[0]])
 )
 
 @web.route("/invite") # Redirect link
-def invite(): return render_template("redirect.html",
+def invite(): return flask.render_template("redirect.html",
     title= "Invite Savage Cabbage",
     redirect= BOT_INVITE_LINK,
     website_homepage= WEBSITE_HOMEPAGE,
@@ -57,7 +68,7 @@ def invite(): return render_template("redirect.html",
 )
 
 @web.route("/server-invite") # Redirect link
-def server_invite(): return render_template("redirect.html",
+def server_invite(): return flask.render_template("redirect.html",
     title= "Savage Cabbage Support Server",
     redirect= SUPPORT_GUILD_INVITE,
     website_homepage= WEBSITE_HOMEPAGE,
@@ -66,16 +77,22 @@ def server_invite(): return render_template("redirect.html",
 )
 
 @web.route("/static/icon") # For reference
-def icon(): return send_file("static/icon.jpg",
+def icon(): return flask.send_file("static/icon.jpg",
     mimetype= "image/gif"
 )
 
 
 # Yeet that online!
-def run(): web.run(host= '0.0.0.0', port= 0000)
-def start_server():
-    """Start the webserver to keep this bot online!"""
-    t = threading.Thread(target= run)
-    t.start()
+def run():
+    web.run(host= "0.0.0.0", port= 0000)
+def start_server(BOT):
+    """Start the webserver to keep this bot online! (but since I"""
+    global bot
+    bot = BOT
 
-if __name__ == "__main__": web.run(debug= True)
+    threading.Thread(target= run).start()
+
+
+if __name__ == "__main__":
+    bot = commands.Bot("test bot")
+    web.run(debug= True)

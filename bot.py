@@ -14,7 +14,8 @@ bot = commands.Bot(
     command_prefix= prefix,
     status= discord.Status.idle,
     owner_id= 272967064531238912,
-    activity= discord.Game(name= "Restarting..."))
+    description= "yayeet",
+    activity= discord.Game("Restarting..."))
 
 
 # Setup events
@@ -31,7 +32,7 @@ async def on_ready():
 
     bot.commands_run, bot.non_admin_commands_run, bot.initial_cogs = 0, 0, [
         "general", "fun", "currency",
-        "memey", "text", "admin", "image", "config"
+        "memey", "text", "admin", "image", "moderation"
     ]
     
 
@@ -83,11 +84,11 @@ async def on_guild_remove(guild):
 
 
 # Message events
-'''@bot.before_invoke
+@bot.before_invoke
 async def before_invoke(ctx):
     """Setup command-based refreshing data"""
     bot.send = SendEmbed(ctx).Send
-'''
+
 @bot.event
 async def on_command(ctx):
     """Log commands run"""
@@ -119,8 +120,8 @@ async def on_message(m):
 async def on_command_error(ctx, error):
     """Handle errors"""
     
-    embed = discord.Embed(color = r.randint(0, 0xFFFFFF))
-    ignored_errors = (commands.NotOwner)
+    embed = discord.Embed(color= r.randint(0, 0xFFFFFF))
+    ignored_errors = (commands.NotOwner, commands.CommandNotFound, commands.DisabledCommand)
     missing_param_errors = (commands.MissingRequiredArgument, commands.BadArgument, commands.TooManyArguments, commands.UserInputError)
     
 
@@ -148,7 +149,7 @@ async def on_command_error(ctx, error):
         embed.title, embed.color= f"An error occoured", 0xFF8C00
         embed.description= f"**Traceback:**\n```py\n{format_error(error)}```"
 
-        em= discord.Embed(
+        em = discord.Embed(
             color= 0xFFA500,
             title= "💣 Oof, an error occoured 💥",
             description= f"Please [join the support guild]({SUPPORT_GUILD_INVITE}) and tell **{bot.admins[0]}** what happened to help fix this bug")
@@ -162,5 +163,5 @@ async def on_command_error(ctx, error):
             await ctx.send(embed= em)
 
 
-webserver.start_server() # Implement bot in here too somehow
+# webserver.start_server(bot) # Implement bot in here too somehow
 bot.run(os.getenv("BOT_TOKEN"))
