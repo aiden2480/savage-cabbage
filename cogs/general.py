@@ -52,32 +52,29 @@ class General(commands.Cog):
 
 
     @commands.command()
-    async def ping(self, ctx): await ctx.send(f":ping_pong: Pong - **{str(int(self.bot.latency*1000))}**ms :ping_pong:")
+    async def ping(self, ctx):
+        await ctx.send(f":ping_pong: Pong - **{str(int(self.bot.latency*1000))}**ms :ping_pong:")
 
 
     @commands.cooldown(2, 10)
-    @commands.command(name= "status")
+    @commands.command(name= "status", disabled= True)
     async def _status(self, ctx, *status):
         """Change my status!"""
-        await ctx.send(status[0])
-        await ctx.send(status[1:])
-        return
-        if not status:
-            _= await change_status(self.bot)
-            await ctx.send(embed= discord.Embed(
-                description= "ok, I'm now **{0} {1}**".format({0: "Playing", 1: "Streaming", 2: "Listening to", 3: "Watching"}[_[0]], _[1]),
-                color= r.randint(0, 0xFFFFFF)
-            ))
-        elif status and ctx.author in self.bot.admins:
-            # try: status= (int(status[0]), status[1:])
-            # except ValueError: return await ctx.send(f"This is the correct usage:\n\n{ctx.prefix}status [0|1|2|3] [status...]")
 
-            _= await change_status(self.bot, type_text= status)
-            embed= discord.Embed(
-                title= "Admin status change",
-                description= "ok, I'm now **{0} {1}**".format({0: "Playing", 1: "Streaming", 2: "Listening to", 3: "Watching"}[_[0]], " ".join(_[1:])),
-                color= r.randint(0, 0xFFFFFF))
-            embed.set_footer(text= "0- Playing, 1- Streaming, 2- Listening to, 3- Watching")
+        conversion = {0: "Playing", 1: "Streaming", 2: "Listening to", 3: "Watching"}
+        if status == ():
+            _ = await change_status(self.bot)
+            await ctx.send(embed= discord.Embed(
+                description= "ok, my status is now **{0} {1}**".format(conversion[_[0]], _[1]),
+                color= r.randint(0, 0xFFFFFF)))
+        elif ctx.author in self.bot.admins:
+            embed= discord.Embed(title= "Admin status change", color= r.randint(0, 0xFFFFFF))
+            try: _ = await change_status(self.bot, type_text= ({"playing": 0, "streaming": 1, "listeningto": 2, "watching": 3}[status[0]], " ".join(status[1:])))
+            except (KeyError, IndexError): return await ctx.send(embed= discord.Embed(
+                color= r.randint(0, 0xFFFFFF),
+                description= f"Proper usage: `{ctx.prefix}status [playing|streaming|listeningto|watching] <status>`"))
+
+            embed.description = "ok, my status is now **{0} {1}**".format(conversion[_[0]], _[1]),
             await ctx.send(embed= embed)
 
 
@@ -92,7 +89,10 @@ class General(commands.Cog):
             color= r.randint(0, 0xFFFFFF))
         embed.set_footer(text= ctx.author, icon_url= ctx.author.avatar_url)
 
-        await self.bot.get_channel(502963219879559168).send(embed= embed, files= files)
+        msg = await self.bot.get_channel(502963219879559168).send(embed= embed)
+        await msg.add_reaction("👍")
+        await msg.add_reaction("👎")
+
         await ctx.send(embed= discord.Embed(
             color= r.randint(0, 0xFFFFFF),
             title= "Suggestion recieved",
@@ -116,6 +116,20 @@ class General(commands.Cog):
         """Vote for the bot on discord bot sites"""
         await self.bot.send("**:arrow_up: Upvote links :newspaper2:**",
             " - [**Discord Bot List**](https://discordbotlist.com/bots/492873992982757406/upvote)")
+    
+
+    @commands.cooldown(3, 5)
+    @commands.command(aliases=["whois", "user-info"], disabled= True)
+    async def userinfo(self, ctx, user: discord.Member):
+        if user is None: user = ctx.author
+                
+        embed = discord.Embed(color=r.randint(0, 0xFFFFFF), title=f'User Info for {user.name}')
+        embed.add_field(name='Status', value=f'{ctx.message.author.status}')       
+        embed.add_field(name='Account Created', value=ctx.message.author.created_at.__format__('%A, %B %d, %Y'))
+        embed.add_field(name='ID', value=f'{ctx.message.author.id}')
+        embed.set_thumbnail(url=ctx.message.author.avatar_url)
+
+        await ctx.send(embed= embed)
 
 
 def setup(bot): bot.add_cog(General(bot))

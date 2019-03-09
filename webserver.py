@@ -1,17 +1,19 @@
 # Flask setup
+import sys
 import flask
 import threading
 import random as r
 from discord.ext import commands
-web = flask.Flask("Savage Cabbage Website")
+web = flask.Flask("Savage Cabbage Website", 
+    template_folder= "web/templates",
+    static_folder= "web/static",
+)
 
 # Logging setup
 import logging
 log = logging.getLogger("werkzeug")
 log.setLevel(logging.ERROR)
 
-# Bot setup
-bot: commands.Bot
 
 # Commands setup
 from setup import (
@@ -20,34 +22,14 @@ from setup import (
     UPDATE_LOG, roasts_no_bold
 )
 
-command_info = {
-    "general": [["help", "stop it, get some help"], ["info", "stats about the bot"], ["suggest", "send a helpful suggestion!"]],
-    
-    "memey": [["meme", "get the freshest memes off reddit"], ["vr", "image manipulation of the classic vr template"], ["spongebob", "just you wait and see"]],
-    
-    "currency": [["daily", "1k coins, once a day"], ["steal", "steal from another user, spoopy"], ["bank", "view the contents of your bank"]],
-}
-
 
 # Web Routes
 @web.route("/") # Static link
-def index():
-    # print(bot.cogs)
-    command_info= {}
-    for cog in bot.cogs:
-        command_info[cog]= []
-        for cmd in cog.get_commands():
-            if not cmd.hidden and cmd.enabled:
-                command_info[cog].append([cmd.name, cmd.help])
-    
-    return flask.render_template("index.html",
-        bot= bot,
-        run_time= RUN_TIME,
-        source_code= SOURCE_CODE,
-        command_info= command_info,
-        website_homepage= WEBSITE_HOMEPAGE,
-        choice_roast= r.choice(roasts_no_bold),
-        bot_stats= (len(list(bot.get_all_members())), len(bot.guilds)),
+def index(): return flask.render_template("index.html",
+    run_time= RUN_TIME,
+    source_code= SOURCE_CODE,
+    website_homepage= WEBSITE_HOMEPAGE,
+    choice_roast= r.choice(roasts_no_bold),
 )
 
 @web.route("/log")
@@ -77,22 +59,14 @@ def server_invite(): return flask.render_template("redirect.html",
 )
 
 @web.route("/static/icon") # For reference
-def icon(): return flask.send_file("static/icon.jpg",
+def icon(): return flask.send_file("web/static/icon.jpg",
     mimetype= "image/gif"
 )
 
+@web.errorhandler(404)
+def four0four(e): return flask.render_template("errors/404.html"), 404
+
 
 # Yeet that online!
-def run():
-    web.run(host= "0.0.0.0", port= 0000)
-def start_server(BOT):
-    """Start the webserver to keep this bot online! (but since I"""
-    global bot
-    bot = BOT
-
-    threading.Thread(target= run).start()
-
-
 if __name__ == "__main__":
-    bot = commands.Bot("test bot")
-    web.run(debug= True)
+    web.run()

@@ -7,6 +7,7 @@ import webserver
 import random as r
 from setup import *
 from discord.ext import commands
+from cogs.assets import keepalive
 
 
 _runtime_ = time.time()
@@ -14,7 +15,6 @@ bot = commands.Bot(
     command_prefix= prefix,
     status= discord.Status.idle,
     owner_id= 272967064531238912,
-    description= "yayeet",
     activity= discord.Game("Restarting..."))
 
 
@@ -30,7 +30,7 @@ async def on_ready():
     ]]
 
 
-    bot.commands_run, bot.non_admin_commands_run, bot.initial_cogs = 0, 0, [
+    bot.commands_run, bot.non_admin_commands_run, bot.banlist, bot.initial_cogs = 0, 0, [], [
         "general", "fun", "currency",
         "memey", "text", "admin", "image", "moderation"
     ]
@@ -44,6 +44,9 @@ async def on_ready():
             print(f"Could not load cog {cog}: {e}")
             await bot.get_channel(546570094449393665).send(f"{bot.admins[0].mention}, cog **{cog}** could not be loaded", embed= discord.Embed(description= f"```py\n{e}```", color= r.randint(0, 0xFFFFFF)))
 
+    for ban in await bot.get_guild(496081601755611137).bans():
+        bot.banlist.append((ban.user.id, ban.reason))
+    print(bot.banlist)
 
     bot.current_status = await change_status(bot)
     bot.serverprefixes = json.loads(requests.get(os.getenv("DATABASE_URL")+"/server-prefixes").text)["result"] # Change from requests though this first time might be ok
@@ -107,8 +110,8 @@ async def on_command(ctx):
 
 @bot.event
 async def on_message(m):
-    if m.author == bot.user: return
-    #if m.author.id in bot.database["banlist"]: return
+    if m.author == bot.user or m.author.bot: return
+    if m.author in bot.banlist: return
 
     if m.content == "no u": await m.channel.send("no u")
 
@@ -121,7 +124,7 @@ async def on_command_error(ctx, error):
     """Handle errors"""
     
     embed = discord.Embed(color= r.randint(0, 0xFFFFFF))
-    ignored_errors = (commands.NotOwner, commands.CommandNotFound, commands.DisabledCommand)
+    ignored_errors = (commands.NotOwner, commands.CommandNotFound)
     missing_param_errors = (commands.MissingRequiredArgument, commands.BadArgument, commands.TooManyArguments, commands.UserInputError)
     
 
@@ -136,6 +139,16 @@ async def on_command_error(ctx, error):
     elif isinstance(error, commands.CommandNotFound):
         if ctx.guild != None: # DM commands don't need prefix
             await ctx.send(f"thats not a command lol {emojis.partyparrot}")
+    elif isinstance(error, commands.DisabledCommand):
+        if ctx.author.id == bot.admins[0].id:
+            ctx.command.disabled = False
+            await ctx.reinvoke()
+            ctx.command.disabled = True
+
+            msg = await ctx.send(embed= discord.Embed(description= "ADMIN ONLY COMMAND", color= discord.Colour.orange()))
+            await asyncio.sleep(2)
+            await msg.delete()
+        else: pass # User trying to use disabled command
     elif isinstance(error, commands.NoPrivateMessage):
         await ctx.send("oof, this is a `guild-only` command!")
     elif isinstance(error, commands.CommandOnCooldown):
@@ -163,5 +176,5 @@ async def on_command_error(ctx, error):
             await ctx.send(embed= em)
 
 
-# webserver.start_server(bot) # Implement bot in here too somehow
+keepalive.keep_alive()
 bot.run(os.getenv("BOT_TOKEN"))

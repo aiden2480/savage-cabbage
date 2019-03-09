@@ -21,7 +21,7 @@ class Memey(commands.Cog):
     
 
     # Roasting
-    @commands.group()
+    @commands.group(aliases= ["burn", "bully"])
     @commands.cooldown(2, 3)
     async def roast(self, ctx):
         if ctx.invoked_subcommand is None: # Roast self (idk why u would though)
@@ -31,7 +31,7 @@ class Memey(commands.Cog):
                 color= r.randint(0, 0xFFFFFF)
             ))
         
-        if isinstance(ctx.subcommand_passed, discord.User): # Roast another user (that's more like it)
+        if ctx.subcommand_passed is discord.User: # Roast another user (that's more like it)
             await ctx.send(embed= discord.Embed(
                 title= f"{r.choice(greetings)} {str(ctx.subcommand_passed)},",
                 description= r.choice(roasts),

@@ -10,7 +10,7 @@ class Moderation(commands.Cog):
 
     @commands.guild_only()
     @commands.cooldown(3, 5)
-    @commands.command(name= "prefix")
+    @commands.command(name= "prefix", disabled= True)
     async def _prefix(self, ctx, *, prefix= None):
         """Change the bot prefix for this server!"""
 
@@ -25,11 +25,6 @@ class Moderation(commands.Cog):
                 self.db.store(f"server-prefixes/{ctx.guild.id}", {prefix})
                 await ctx.send(f"👍 Success! Your server prefix is now `{prefix}`")
         else: await ctx.send("You need `manage server` perms to change the prefix!")
-            
-    @commands.command()
-    @commands.guild_only()
-    async def blah(self, ctx):
-        await ctx.send("no u")
 
 
 def setup(bot): bot.add_cog(Moderation(bot))

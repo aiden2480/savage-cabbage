@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Savage Cabbage Bot</title>
-        <meta content="Savage Cabbage's Website" property="og:title"><meta content="The ultimate hub for info about the bot, stats, the entire list of commands and more!" property="og:description"><meta content="{{website_homepage}}/static/icon.jpg" property="og:image"><meta name="theme-color" content="#01A300">		
+        <meta content="Savage Cabbage's Website" property="og:title"><meta content="The ultimate hub for info about the bot, stats, the entire list of commands and more!" property="og:description"><meta content="{{website_homepage}}/static/icon" property="og:image"><meta name="theme-color" content="#01A300">		
 		<link rel="icon" href="/static/icon.jpg"><link rel="stylesheet" type="text/css" href="/static/styling.css"><meta charset="UTF-8"><meta name="author" content="chocolatejade42"><meta name="keywords" content="Discord,SavageCabbage,Python,DiscordPy"><meta name="description" content="Savage Cabbage Discord Bot"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 	</head>
 	<body>
@@ -23,23 +23,23 @@
 
 		<h1 id="info">Info</h1>
 		<p>Savage Cabbage was developed by <a href="https://github.com/aiden2480" target="_blank">chocolatejade42</a> and started development on the 22<sup>nd</sup> of September 2018. The last update was <b>{{run_time}}</b> AEST.</p>
-		<p>Use <u>$autoroast</u> in a channel that the bot has access in to get randomly generated quotes, such as this one: <b>{{choice_roast}}</b>.</p>
+		<!--<p>Use <u>$autoroast</u> in a channel that the bot has access in to get randomly generated quotes, such as this one: <b>{{choice_roast}}</b></p>-->
 		
 
 		<h1 id="stats">Stats</h1>
 		<p>Uptime stats and error logs can be viewed <a href="https://stats.uptimerobot.com/M1NrQcXJv/781037937" target="_blank">here</a>. This only shows stats from the last week though. Update logs and changes can be viewed <a href="logs" target="_blank">here</a>.</p>
-		<p>The bot currently has <b>{{bot_stats[0]}}</b> users accross <b>{{bot_stats[1]}}</b> guilds</p>
+		<!--<p>The bot currently has <b>bot_stats[0]</b> users accross <b>bot_stats[1]</b> guilds</p>-->
 
 
 		<h1 id="cmds">Commands</h1>
-		<p>The different command types are: <b>{{", ".join(command_info.keys())}}</b> and thier various commands inclue;</p>
+		<!--<p>The different command types are: <b>", ".join(command_info.keys())</b> and thier various commands inclue;</p>-->
 		
-		<ul>{% for class in command_info %}
+		<!--<ul>{% for class in command_info %}
 			<h4><b>{{class.upper()}} COMMANDS</b></h4>
 			{% for command in command_info[class] %}
 				<li>{{command[0]}}: {{command[1]}}</li>
 			{% endfor %}
-		{% endfor %}</ul>
+		{% endfor %}</ul>-->
 		
 		
 		<h1 id="links">Links</h1>

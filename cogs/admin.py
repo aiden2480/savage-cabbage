@@ -1,8 +1,11 @@
+import json
 import time
 import inspect
 import discord
 import random as r
+from setup import aiohttpget
 from discord.ext import commands
+
 
 class Admin(commands.Cog):
     def __init__(self, bot: commands.Bot): self.bot = bot
@@ -77,8 +80,6 @@ class Admin(commands.Cog):
         # # # # # # # # # # # # # Reload bot # # # # # # # # # # # # # #
 
         def update_embed(embed):
-            """Let's hope that the globaling works -_-"""
-            
             embed.clear_fields()
             embed.add_field(name= "Previous cogs", value= "\n".join(prev_cogs) or "None")
             embed.add_field(name= "Reloaded cogs", value= "\n".join(reloaded_cogs) or "None")
@@ -124,21 +125,76 @@ class Admin(commands.Cog):
 
     # To-do list
     @commands.is_owner()
-    @commands.command(hidden= True)
-    async def todo(self, ctx, *, task):
+    @commands.group(hidden= True)
+    async def todo(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send(embed= discord.Embed(
+                description= f"Use `{ctx.prefix}todo add <suggestion>` to add a task or `{ctx.prefix}todo list` to view the list",
+                color= r.randint(0, 0xFFFFFF)))
+
+    @todo.command()
+    async def add(self, ctx, *, task):
         msg=await self.bot.get_channel(551203556896538627).send(embed= discord.Embed(
             title= "Added to the to-do list:", description= task,
             color= discord.Colour.blurple()))
+        await msg.add_reaction("👍")
+        await msg.add_reaction("👎")
         
         await ctx.send(embed= discord.Embed(title= "Added to the to-do list:", description= f"{task}\n\nView task [here]({msg.jump_url})", color= discord.Colour.blurple()))
 
+    @todo.command(name= "list")
+    async def _list(self, ctx):
+        chnl, data = self.bot.get_channel(551203556896538627), []
 
+        async for msg in chnl.history():
+            if msg.author.bot: # Some messages from me in there
+                msg_data = {}
+                msg_data["upvotes"] = 0
+
+                msg_data["task"] = msg.embeds[0].description
+                for reaction in msg.reactions:
+                    print(str(reaction.emoji))
+                    if str(reaction.emoji) == "👍":
+                        print("upvote")
+                        msg_data["upvotes"] += 1
+                    if str(reaction.emoji) == "👎":
+                        print("downvote")
+                        msg_data["upvotes"] -= 1
+                
+                data.append(msg_data)
+        await ctx.send(data)
+        for entry in data:
+            print(entry["upvotes"])
+
+
+    # Check servers
     @commands.is_owner()
     @commands.command(hidden= True, aliases= ["guilds"])
     async def servers(self, ctx):
         msg= "**All servers**\n"
         for guild in self.bot.guilds: msg += f"{guild.name} - {guild.member_count} members\n"
         await ctx.send(msg)
+
+
+    # Check last updates and commits
+    @commands.is_owner()
+    @commands.command(hidden= True)
+    async def updates(self, ctx: commands.Context):
+        await ctx.trigger_typing()
+
+        embed= discord.Embed(title= "Last 5 updates", description= "", color= r.randint(0, 0xFFFFFF))
+        data = json.loads(await aiohttpget("https://api.github.com/repos/aiden2480/savage-cabbage/commits?per_page=5"))
+        _committer = data[0]["committer"]
+        embed.set_author(name= _committer["login"], url= _committer["html_url"], icon_url= _committer["avatar_url"])
+
+        for update in data:
+            _cmt_date = update["commit"]["author"]["date"].replace("T", " ").replace("Z", "")
+            _id = update["sha"][0:5]
+            _url = update["html_url"]
+            _desc = update["commit"]["message"]
+            embed.description += f"**{_cmt_date}** - [`{_id}`]({_url}) {_desc}\n\n"
+        
+        await ctx.send(embed= embed)
 
 
     # Get command source
@@ -151,6 +207,18 @@ class Admin(commands.Cog):
         await ctx.send(f"**Here ya go**```py\n{inspect.getsource(cmd.callback)}```")
     
 
+    # Check which users have been banned
+    @commands.is_owner()
+    @commands.command(hidden= True, aliases= ["banlist"])
+    async def botbans(self, ctx):
+        embed= discord.Embed(title= "Bot bans", description= "", color= r.randint(0, 0xFFFFFF))
+        for ban in self.bot.banlist:
+            usr= await self.bot.get_user_info(ban[0])
+            embed.description += f"{usr}, ID {ban[0]}. Banned for **{ban[1]}**\n\n"
+        
+        await ctx.send(embed= embed)
+
+    # Shutdown the bot
     @commands.is_owner()
     @commands.command(hidden= True)
     async def shutdown(self, ctx):
