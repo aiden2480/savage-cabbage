@@ -153,18 +153,13 @@ class Admin(commands.Cog):
 
                 msg_data["task"] = msg.embeds[0].description
                 for reaction in msg.reactions:
-                    print(str(reaction.emoji))
                     if str(reaction.emoji) == "👍":
-                        print("upvote")
                         msg_data["upvotes"] += 1
                     if str(reaction.emoji) == "👎":
-                        print("downvote")
                         msg_data["upvotes"] -= 1
                 
                 data.append(msg_data)
         await ctx.send(data)
-        for entry in data:
-            print(entry["upvotes"])
 
 
     # Check servers

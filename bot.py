@@ -2,21 +2,23 @@ import os
 import time
 import json
 import discord
+import aiohttp
 import requests
 import webserver
 import random as r
 from setup import *
 from discord.ext import commands
 from cogs.assets import keepalive
+from cogs.assets import custombot
 
 
 _runtime_ = time.time()
-bot = commands.Bot(
+bot = custombot.CustomBot(
     command_prefix= prefix,
     status= discord.Status.idle,
     owner_id= 272967064531238912,
-    activity= discord.Game("Restarting..."))
-
+    activity= discord.Game("Restarting...")
+)
 
 # Setup events
 @bot.event
@@ -29,26 +31,15 @@ async def on_ready():
         297229962971447297, # Jack
     ]]
 
-
-    bot.commands_run, bot.non_admin_commands_run, bot.banlist, bot.initial_cogs = 0, 0, [], [
-        "general", "fun", "currency",
-        "memey", "text", "admin", "image", "moderation"
-    ]
-    
-
-    # bot.remove_command("help")
-    bot.no_bypass_cooldown_commands = ["daily"]
     for cog in bot.initial_cogs:
         try: bot.load_extension(f"cogs.{cog}")
         except Exception as e:
             print(f"Could not load cog {cog}: {e}")
             await bot.get_channel(546570094449393665).send(f"{bot.admins[0].mention}, cog **{cog}** could not be loaded", embed= discord.Embed(description= f"```py\n{e}```", color= r.randint(0, 0xFFFFFF)))
 
-    for ban in await bot.get_guild(496081601755611137).bans():
-        bot.banlist.append((ban.user.id, ban.reason))
-    print(bot.banlist)
-
+    bot.requester = aiohttp.ClientSession()
     bot.current_status = await change_status(bot)
+    for ban in await bot.get_guild(496081601755611137).bans(): bot.banlist.append((ban.user.id, ban.reason))
     bot.serverprefixes = json.loads(requests.get(os.getenv("DATABASE_URL")+"/server-prefixes").text)["result"] # Change from requests though this first time might be ok
     print(f"Logged in as {bot.user} - {len(list(bot.get_all_members()))} users across {len(bot.guilds)} guilds - Loaded in {round(time.time()- _runtime_, 2)} seconds")
     if bot.user.id == 492873992982757406: await bot.get_channel(542961329867063326).send(embed= discord.Embed(title= "Bot restarted", description= f"Loaded in {round(time.time()- _runtime_, 2)} seconds\n\nRestarted: {get_time()}", color= 0x00BFFF))
@@ -109,9 +100,10 @@ async def on_command(ctx):
     if ctx.author not in bot.admins: bot.non_admin_commands_run += 1
 
 @bot.event
-async def on_message(m):
-    if m.author == bot.user or m.author.bot: return
-    if m.author in bot.banlist: return
+async def on_message(m: discord.Message):
+    if m.author == bot.user or \
+        m.author in bot.banlist or \
+            m.author.bot == True: return
 
     if m.content == "no u": await m.channel.send("no u")
 

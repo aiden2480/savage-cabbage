@@ -54,6 +54,7 @@ class Memey(commands.Cog):
         await ctx.send(embed= embed)
 
 
+    """
     # Make your own memes!
     @commands.cooldown(3, 10)
     @commands.group(aliases= ["makememe"])
@@ -82,7 +83,7 @@ class Memey(commands.Cog):
             title= "The different meme templates are;",
             description= "I really should make this command....",
             color= r.randint(0, 0xFFFFFF)
-        ))
+        ))"""
 
     # Quotes
     @commands.cooldown(2, 4)
@@ -139,7 +140,8 @@ class Memey(commands.Cog):
         await ctx.send(embed= embed)
 
 
-    """# Reddit Scraping
+    """
+    # Reddit Scraping
     @commands.cooldown(3, 10)
     @commands.command(aliases= ["reddit"])
     async def meme(self, ctx, subreddit="dankmemes"):
@@ -160,7 +162,7 @@ class Memey(commands.Cog):
                     #await ctx.say(embed= embed)
                     #break
                 #else: continue
-    """
+    
 
     # Completely broken
     @commands.command()
@@ -175,7 +177,7 @@ class Memey(commands.Cog):
         im.save(f"cogs/assets/memey/temp/{ctx.author.id}.jpg")
         embed.set_image(url= f"attachment://cogs/assets/memey/temp/{ctx.author.id}.jpg")
         await ctx.send(embed= embed)
-        os.remove(f"cogs/assets/memey/temp/{ctx.author.id}.jpg")
+        os.remove(f"cogs/assets/memey/temp/{ctx.author.id}.jpg")"""
         
 
 def setup(bot): bot.add_cog(Memey(bot))

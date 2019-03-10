@@ -89,23 +89,4 @@ class Fun(commands.Cog):
         await msg.edit(embed= embed)
 
 
-    @commands.command(disabled= True)
-    @commands.cooldown(2, 6)
-    async def poll(self, ctx, *, args):
-        """Create a poll! `poll multi-word title::arg1::arg2..`"""
-        return await ctx.send("hi")
-        regional_indicators, letters, i = "🇦🇧🇨🇩🇪🇫🇬🇭🇮🇯", "ABCDEFGHIJ", 0
-        embed= discord.Embed(color= r.randint(0, 0xFFFFFF), title= args.split("::")[0].strip(), description= "")
-        
-        for arg in [arg.strip() for arg in arg.split("::")][1:]:
-            embed.description += f"**{letters[i]}**: {arg}"
-            i += 1
-        
-        i = 0
-        msg = await ctx.send(embed= embed)
-        for _ in [arg.strip() for arg in arg.split("::")][1:]:
-            await msg.add_reaction(regional_indicators[i])
-            i += 1
-
-
 def setup(bot): bot.add_cog(Fun(bot))
