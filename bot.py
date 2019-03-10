@@ -105,7 +105,7 @@ async def on_message(m: discord.Message):
         m.author in bot.banlist or \
             m.author.bot == True: return
 
-    if m.content == "no u": await m.channel.send("no u")
+    if m.content in ["no u", "のう"]: await m.channel.send(m.content)
 
     await bot.process_commands(m)
 
@@ -168,5 +168,5 @@ async def on_command_error(ctx, error):
             await ctx.send(embed= em)
 
 
-keepalive.keep_alive()
+if not locally_testing: keepalive.keep_alive()
 bot.run(os.getenv("BOT_TOKEN"))

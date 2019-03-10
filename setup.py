@@ -11,9 +11,10 @@ from discord.ext import commands
 
 # Load env for local testing
 try:
+    locally_testing= True
     import dotenv
     dotenv.load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
-except ModuleNotFoundError: pass
+except ModuleNotFoundError: locally_testing= False
 
 
 # Classes

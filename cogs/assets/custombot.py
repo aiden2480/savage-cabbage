@@ -8,5 +8,5 @@ class CustomBot(commands.Bot):
     banlist, initial_cogs = [], [
         "general", "fun", "currency",
         "memey", "text", "admin", "image",
-        "moderation"
+        "moderation", "animals",
     ]

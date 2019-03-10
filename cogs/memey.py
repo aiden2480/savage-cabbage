@@ -89,7 +89,7 @@ class Memey(commands.Cog):
     @commands.cooldown(2, 4)
     @commands.command(aliases= ["chucknorrisquote"])
     async def chucknorris(self, ctx):
-        """Get chuck norris ~~jokes~~ facts"""
+        """Get chuck norris facts"""
         await ctx.trigger_typing()
 
         data = json.loads(await aiohttpget("https://api.chucknorris.io/jokes/random"))
@@ -102,7 +102,7 @@ class Memey(commands.Cog):
     @commands.cooldown(2, 4)
     @commands.command(aliases= ["donaldtrumpquote", "trumpquote"])
     async def donaldtrump(self, ctx):
-        """Dumb quotes from the master of dumb quotes"""
+        """Dumb quotes from the master of dumb quotes (actual quotes)"""
         await ctx.trigger_typing()
 
         data = json.loads(await aiohttpget("https://api.tronalddump.io/random/quote"))
@@ -115,7 +115,7 @@ class Memey(commands.Cog):
     @commands.cooldown(2, 4)
     @commands.command(aliases= ["yomamajoke"])
     async def yomama(self, ctx):
-        """yeah, its really much like the other 2"""
+        """Yo mama so stupid, she don't even know what a yo mama joke is!"""
         await ctx.trigger_typing()
 
         data = json.loads(await aiohttpget("https://api.yomomma.info/"))
@@ -153,31 +153,15 @@ class Memey(commands.Cog):
                     "MinecraftMemes", "ROBLOXmemes", # "DeepFriedMemes",
                 ])).random()
 
-                #if r_sub.url.endswith(".png") or r_sub.url.endswith(".jpg"):
-                    #embed = discord.Embed(title= r_sub.title, color= r.randint(0, 0xFFFFFF))
-                    #embed= discord.Embed()
-                    #embed.set_image(url= r_sub.url)
-                    #embed.set_footer(text= f"⬆ {r_sub.score} 💭 {r_sub.num_comments}")
-                    #print("got one!")
-                    #await ctx.say(embed= embed)
-                    #break
-                #else: continue
-    
-
-    # Completely broken
-    @commands.command()
-    @commands.cooldown(3, 10)
-    async def vr(self, ctx, *, text):
-        embed = discord.Embed(color= r.randint(0, 0xFFFFFF))
-        im = Image.open(io.BytesIO("cogs/assets/memey/templates/vr.jpg"))
-        d = ImageDraw.Draw(im)
-        d.text((60, 525), "\n".join(textwrap.wrap(text, 13)), (100, 100, 200), ImageFont.truetype("cogs/assets/memey/fonts/batmanforever.ttf", 25))
-        d.text()
-        
-        im.save(f"cogs/assets/memey/temp/{ctx.author.id}.jpg")
-        embed.set_image(url= f"attachment://cogs/assets/memey/temp/{ctx.author.id}.jpg")
-        await ctx.send(embed= embed)
-        os.remove(f"cogs/assets/memey/temp/{ctx.author.id}.jpg")"""
+                if r_sub.url.endswith(".png") or r_sub.url.endswith(".jpg"):
+                    embed = discord.Embed(title= r_sub.title, color= r.randint(0, 0xFFFFFF))
+                    embed= discord.Embed()
+                    embed.set_image(url= r_sub.url)
+                    embed.set_footer(text= f"⬆ {r_sub.score} 💭 {r_sub.num_comments}")
+                    print("got one!")
+                    await ctx.say(embed= embed)
+                    break
+                else: continue"""
         
 
 def setup(bot): bot.add_cog(Memey(bot))
