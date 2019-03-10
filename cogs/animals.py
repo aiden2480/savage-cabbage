@@ -5,7 +5,7 @@ from discord.ext import commands
 from cogs.assets.custombot import CustomBot
 
 
-class Template(commands.Cog):
+class Animals(commands.Cog):
     """Class description"""
     def __init__(self, bot: CustomBot): self.bot = bot
     
@@ -66,4 +66,4 @@ class Template(commands.Cog):
         await ctx.send(embed= embed)
 
 
-def setup(bot): bot.add_cog(Template(bot))
+def setup(bot): bot.add_cog(Animals(bot))

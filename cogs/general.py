@@ -53,6 +53,7 @@ class General(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
+        """Check the bots latency 🏓"""
         await ctx.send(f":ping_pong: Pong - **{str(int(self.bot.latency*1000))}**ms :ping_pong:")
 
 

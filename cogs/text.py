@@ -17,6 +17,7 @@ class Text(commands.Cog):
     @commands.command()
     @commands.cooldown(2, 3)
     async def emojify(self, ctx, *, text: str):
+        """Convert text into regional indicators"""
         result= ""
         for character in text:
             if character in list("abcdefghijklmnopqrstuvwxyz"):

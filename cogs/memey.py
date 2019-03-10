@@ -24,6 +24,7 @@ class Memey(commands.Cog):
     @commands.group(aliases= ["burn", "bully"])
     @commands.cooldown(2, 3)
     async def roast(self, ctx):
+        """Really badly piss off someone"""
         if ctx.invoked_subcommand is None: # Roast self (idk why u would though)
             await ctx.send(embed= discord.Embed(
                 title= f"{r.choice(greetings)} {ctx.author.name},",
