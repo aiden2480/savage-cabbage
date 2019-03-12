@@ -27,4 +27,6 @@ class Moderation(commands.Cog):
         else: await ctx.send("You need `manage server` perms to change the prefix!")
 
 
-def setup(bot): bot.add_cog(Moderation(bot))
+def setup(bot):
+    return # Still trying to get the database to work so you'll have to wait
+    bot.add_cog(Moderation(bot))

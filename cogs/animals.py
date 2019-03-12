@@ -2,12 +2,11 @@ import json
 import discord
 import random as r
 from discord.ext import commands
-from cogs.assets.custombot import CustomBot
 
 
 class Animals(commands.Cog):
     """Class description"""
-    def __init__(self, bot: CustomBot): self.bot = bot
+    def __init__(self, bot): self.bot = bot
     
     @commands.command(aliases= ["purr", "kitty"])
     @commands.cooldown(3, 3)
@@ -55,7 +54,7 @@ class Animals(commands.Cog):
     @commands.cooldown(3, 3)
     async def panda(self, ctx):
         """Look ma! Its a panda! 🐼"""
-        await ctx.trigger_typing() # I should get a less dodgy api but oh well
+        await ctx.trigger_typing() # I should get a less dodgy api but oh well (takes about 5 seconds on first scrape in a while)
         url = r.choice(["https://some-random-api.ml/pandaimg", "https://some-random-api.ml/redpandaimg"])
         async with self.bot.requester.get(url) as resp:
             data= json.loads(await resp.read())

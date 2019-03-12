@@ -9,11 +9,10 @@ import random as r
 from setup import *
 from discord.ext import commands
 from cogs.assets import keepalive
-from cogs.assets import custombot
 
 
 _runtime_ = time.time()
-bot = custombot.CustomBot(
+bot = commands.Bot(
     command_prefix= prefix,
     status= discord.Status.idle,
     owner_id= 272967064531238912,
@@ -25,6 +24,13 @@ bot = custombot.CustomBot(
 async def on_ready():
     """My async setup function"""
 
+    bot.initial_cogs = [
+        "general", "fun", # "currency", # Still fixing currency, hold on
+        "memey", "text", "admin", "image",
+        "animals", # "moderation", # Need the db in here too so thats a dud also
+    ]
+
+    bot.remove_command("help")
     bot.admins = [await bot.get_user_info(admin) for admin in [
         272967064531238912, # Me
         454928254558535700, # Dana
@@ -32,15 +38,18 @@ async def on_ready():
     ]]
 
     for cog in bot.initial_cogs:
-        try: bot.load_extension(f"cogs.{cog}")
+        try:  bot.load_extension(f"cogs.{cog}")
         except Exception as e:
             print(f"Could not load cog {cog}: {e}")
             await bot.get_channel(546570094449393665).send(f"{bot.admins[0].mention}, cog **{cog}** could not be loaded", embed= discord.Embed(description= f"```py\n{e}```", color= r.randint(0, 0xFFFFFF)))
 
+    bot.commands_run = bot.non_admin_commands_run = 0
+    bot.banlist, bot.serverprefixes= [], []
+    bot.no_bypass_cooldown_commands = ["daily"]
     bot.requester = aiohttp.ClientSession()
     bot.current_status = await change_status(bot)
     for ban in await bot.get_guild(496081601755611137).bans(): bot.banlist.append((ban.user.id, ban.reason))
-    bot.serverprefixes = json.loads(requests.get(os.getenv("DATABASE_URL")+"/server-prefixes").text)["result"] # Change from requests though this first time might be ok
+    # bot.serverprefixes = json.loads(requests.get(os.getenv("DATABASE_URL")+"/server-prefixes").text)["result"] # Change from requests though this first time might be ok
     print(f"Logged in as {bot.user} - {len(list(bot.get_all_members()))} users across {len(bot.guilds)} guilds - Loaded in {round(time.time()- _runtime_, 2)} seconds")
     if bot.user.id == 492873992982757406: await bot.get_channel(542961329867063326).send(embed= discord.Embed(title= "Bot restarted", description= f"Loaded in {round(time.time()- _runtime_, 2)} seconds\n\nRestarted: {get_time()}", color= 0x00BFFF))
 
@@ -101,11 +110,13 @@ async def on_command(ctx):
 
 @bot.event
 async def on_message(m: discord.Message):
-    if m.author == bot.user or \
+    if m.author == bot.user or    \
         m.author in bot.banlist or \
-            m.author.bot == True: return
+                m.author.bot == True: return
 
-    if m.content in ["no u", "のう"]: await m.channel.send(m.content)
+    if m.content in ["no u", "のう"]:
+        try: await m.channel.send(m.content)
+        except: pass
 
     await bot.process_commands(m)
 
@@ -137,21 +148,28 @@ async def on_command_error(ctx, error):
             await ctx.reinvoke()
             ctx.command.disabled = True
 
-            msg = await ctx.send(embed= discord.Embed(description= "ADMIN ONLY COMMAND", color= discord.Colour.orange()))
+            msg = await ctx.send(embed= discord.Embed(description= "ADMIN ONLY COMMAND", color= discord.Colour.dark_orange()))
             await asyncio.sleep(2)
             await msg.delete()
         else: pass # User trying to use disabled command
     elif isinstance(error, commands.NoPrivateMessage):
-        await ctx.send("oof, this is a `guild-only` command!")
+        await ctx.send("um, this appears to be a `guild-only` command!")
     elif isinstance(error, commands.CommandOnCooldown):
+        wait_time = str(str(error).strip("You are on cooldown. Try again in ")).strip("s")
+        readable_wait_time = format_cooldown_wait(float(wait_time))
+        if readable_wait_time == "now": readable_wait_time = "a second"
+
         if user_in_support_guild(bot, ctx.message.author):
-            if ctx.command.name not in bot.no_bypass_cooldown_commands: return await ctx.reinvoke()
-            else: embed.title, embed.description= "Slow it down, cmon thats not fair", str(error)
+            if ctx.command.name not in bot.no_bypass_cooldown_commands:
+                return await ctx.reinvoke()
+            embed.title, embed.description= "Slow it down, cmon thats not fair", f"Try again in {readable_wait_time}"
         
-        else: embed.title, embed.description= "Slow it down, cmon thats not fair", f"{str(error)}\n\n[Join the support guild]({SUPPORT_GUILD_INVITE}) and you won't have to wait!"
+        else:
+            embed.title, embed.description= "Slow it down, cmon thats not fair", f"Try again in {readable_wait_time}\n\n[Join the support guild]({SUPPORT_GUILD_INVITE}) and you won't have to wait!"
+            await ctx.send(embed= embed)
         await ctx.send(embed= embed)
     else:
-        embed.title, embed.color= f"An error occoured", 0xFF8C00
+        embed.title, embed.colour= f"An error occoured", 0xFF8C00
         embed.description= f"**Traceback:**\n```py\n{format_error(error)}```"
 
         em = discord.Embed(
@@ -160,7 +178,6 @@ async def on_command_error(ctx, error):
             description= f"Please [join the support guild]({SUPPORT_GUILD_INVITE}) and tell **{bot.admins[0]}** what happened to help fix this bug")
         em.set_footer(text= "< Look for this guy!", icon_url= bot.admins[0].avatar_url)
         
-        
         if ctx.author == bot.admins[0] and ctx.guild is None:
             await ctx.send(embed= embed)
         else:
@@ -168,5 +185,6 @@ async def on_command_error(ctx, error):
             await ctx.send(embed= em)
 
 
-if not locally_testing: keepalive.keep_alive()
+if not locally_testing:
+    keepalive.keep_alive() # Keeps it running on the server
 bot.run(os.getenv("BOT_TOKEN"))

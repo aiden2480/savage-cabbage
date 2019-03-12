@@ -28,4 +28,6 @@ class Currency(commands.Cog):
 
 
 
-def setup(bot): pass#bot.add_cog(Currency(bot))
+def setup(bot):
+    return # Still working on this
+    bot.add_cog(Currency(bot))

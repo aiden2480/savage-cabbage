@@ -2,22 +2,36 @@ import time
 import discord
 import random as r
 from discord.ext import commands
+from cogs.assets import paginator
 from setup import emojis, change_status
 from setup import VERSION, RUN_TIME, BOT_INVITE_LINK, SUPPORT_GUILD_INVITE
 
 class General(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    '''
-    # Help command
-    @commands.group(name= "help")
+    
+    @commands.command(name='help')
+    @commands.cooldown(1, 3.0, type=commands.BucketType.member)
     async def _help(self, ctx, *, command: str = None):
-        """Stop it, get some help"""
-        
-        if ctx.invoked_subcommand is None:
-            pass#await pass
-        if ctx.invoked_subcommand
-    '''
+        """Shows help about a command or the bot"""
+
+        try:
+            if command is None:
+                p = await paginator.HelpPaginator.from_bot(ctx)
+            else:
+                entity = self.bot.get_cog(command) or self.bot.get_command(command)
+
+                if entity is None:
+                    clean = command.replace('@', '@\u200b')
+                    return await ctx.send(f'Command or category "{clean}" not found.')
+                elif isinstance(entity, commands.Command):
+                    p = await paginator.HelpPaginator.from_command(ctx, entity)
+                else:
+                    p = await paginator.HelpPaginator.from_cog(ctx, entity)
+
+            await p.paginate()
+        except Exception as e:
+            await ctx.send(e)
 
 
 
@@ -84,13 +98,14 @@ class General(commands.Cog):
     async def suggest(self, ctx, *, suggestion):
         """Suggest a feature, command or report a bug!"""
         
+        await ctx.trigger_typing()
         embed = discord.Embed(
             title= f"Suggestion recieved from {ctx.author.name}",
-            description= f"{ctx.author.mention}: {suggestion}",
-            color= r.randint(0, 0xFFFFFF))
+            description= suggestion,
+            color= discord.Color.dark_gold())
         embed.set_footer(text= ctx.author, icon_url= ctx.author.avatar_url)
 
-        msg = await self.bot.get_channel(502963219879559168).send(embed= embed)
+        msg = await self.bot.get_channel(551203556896538627).send(embed= embed)
         await msg.add_reaction("👍")
         await msg.add_reaction("👎")
 

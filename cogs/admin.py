@@ -145,36 +145,48 @@ class Admin(commands.Cog):
     @todo.command(name= "list")
     async def _list(self, ctx):
         chnl, data = self.bot.get_channel(551203556896538627), []
+        embed = discord.Embed(title= "To-do list", description= "", color= r.randint(0, 0xFFFFFF))
 
         async for msg in chnl.history():
-            if msg.author.bot: # Some messages from me in there
-                msg_data = {}
-                msg_data["upvotes"] = 0
+            if not msg.author.bot: pass # Some messages from me in there
+            
+            msg_data = {}
+            msg_data["upvotes"] = 0
 
-                msg_data["task"] = msg.embeds[0].description
-                for reaction in msg.reactions:
-                    if str(reaction.emoji) == "👍":
-                        msg_data["upvotes"] += 1
-                    if str(reaction.emoji) == "👎":
-                        msg_data["upvotes"] -= 1
-                
-                data.append(msg_data)
-        await ctx.send(data)
+            msg_data["task"] = msg.embeds[0].description
+            for reaction in msg.reactions:
+                if str(reaction.emoji) == "👍":
+                    msg_data["upvotes"] += reaction.count
+                if str(reaction.emoji) == "👎":
+                    msg_data["upvotes"] -= reaction.count
+            
+            data.append(msg_data)
+
+        for task in sorted(data, key= lambda k: -k["upvotes"]):
+            embed.description += f"{task['upvotes']} upvotes - **{task['task']}**\n"
+        embed.set_footer(text= f"{len(data)} tasks on the to-do list")
+        await ctx.send(embed= embed)
 
 
     # Check servers
     @commands.is_owner()
     @commands.command(hidden= True, aliases= ["guilds"])
     async def servers(self, ctx):
-        msg= "**All servers**\n"
-        for guild in self.bot.guilds: msg += f"{guild.name} - {guild.member_count} members\n"
-        await ctx.send(msg)
+        """Get all the servers that the bot is in and how many members"""
+        embed= discord.Embed(title= "**All servers**", description= "", color= r.randint(0, 0xFFFFFF))
+        embed.set_footer(text= f"{len(list(self.bot.get_all_members()))} users across {len(self.bot.guilds)} servers")
+
+        for guild in self.bot.guilds:
+            embed.description += f"{guild.name} - {guild.member_count} members\n"
+        
+        await ctx.send(embed= embed)
 
 
     # Check last updates and commits
     @commands.is_owner()
     @commands.command(hidden= True)
     async def updates(self, ctx: commands.Context):
+        """Get the most recent updates from GitHub (Move to public access?)"""
         await ctx.trigger_typing()
 
         embed= discord.Embed(title= "Last 5 updates", description= "", color= r.randint(0, 0xFFFFFF))

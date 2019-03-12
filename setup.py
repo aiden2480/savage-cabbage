@@ -4,6 +4,7 @@ import asyncio
 import discord
 import aiohttp
 import datetime
+import humanize
 import traceback
 import random as r
 from discord.ext import commands
@@ -52,20 +53,20 @@ async def prefix(bot, message):
     """No prefix needed for DM's"""
     prefixes= ["$"] # For Savage Cabbage
     if bot.user.id == 499721180379349016: prefixes= ["-"] # Savage Cabbage Beta
-    if message.guild:
-        try: prefixes = [bot.serverprefixes[str(message.guild.id)]]
-        except KeyError: pass # No custom prefix
+    #if message.guild:
+    #    try: prefixes = [bot.serverprefixes[str(message.guild.id)]]
+    #    except KeyError: pass # No custom prefix
     if message.guild is None: prefixes.append("") # DM doesn't need prefix
     
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
-def tb_to_str(tb):
-    """Takes a traceback and turns it into a string"""
-    _= ""
-    for line in TracebackException(
-        type(tb[0]), tb[1], tb[2]
-    ).format(chain= True): _+= line
-    return _
+#def tb_to_str(tb):
+#    """Takes a traceback and turns it into a string"""
+#    _= ""
+#    for line in TracebackException(
+#        type(tb[0]), tb[1], tb[2]
+#    ).format(chain= True): _+= line
+#    return _
 
 def get_time():
     """Time in format DD/MM/YYYY HH:MM:SS (str)"""
@@ -76,6 +77,11 @@ def get_time():
     date = "/".join([_date[2], _date[1], _date[0]])
     
     return f"{date} {time}"
+
+def format_cooldown_wait(seconds: float):
+	secs_to_wait = datetime.timedelta(seconds= seconds)
+	diff = datetime.datetime.now() + secs_to_wait
+	return humanize.naturaltime(diff)    
 
 async def change_status(bot, *, type_text: tuple = None):
     """Change the bot's playing status"""
@@ -89,7 +95,7 @@ async def change_status(bot, *, type_text: tuple = None):
         (1, "⌐■_■"),
         (1, "(ง’̀-‘́)ง"),
         (1, "( ͡ᵔ ͜ʖ ͡ᵔ )"),
-        (1, "¯\_(ツ)_/¯"),
+        (1, r"¯\_(ツ)_/¯"),
         (1, "(づ￣ ³￣)づ"),
         (1, "(╯°□°）╯︵ ┻━┻"),
         (1, "┬─┬ ノ( ゜-゜ノ)"),
@@ -109,11 +115,11 @@ async def change_status(bot, *, type_text: tuple = None):
     ])
 
     type_text = (int(type_text[0]), type_text[1])
-    if type_text[0] == 0: activity= discord.Game(name= type_text[1])
-    if type_text[0] == 1: activity= discord.Streaming(name= type_text[1], url= "https://twitch.tv/chocolatejade42")
-    if type_text[0] == 2: activity= discord.Activity(type= discord.ActivityType.listening, name= type_text[1])
-    if type_text[0] == 3: activity= discord.Activity(type= discord.ActivityType.watching, name= type_text[1])
-    
+    if type_text[0] == 0: activity = discord.Game(name= type_text[1])
+    if type_text[0] == 1: activity = discord.Streaming(name= type_text[1], url= "https://twitch.tv/chocolatejade42")
+    if type_text[0] == 2: activity = discord.Activity(type= discord.ActivityType.listening, name= type_text[1])
+    if type_text[0] == 3: activity = discord.Activity(type= discord.ActivityType.watching, name= type_text[1])
+ 
     await bot.change_presence(activity= activity)
     return type_text
 

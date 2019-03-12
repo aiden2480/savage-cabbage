@@ -9,18 +9,12 @@ class Fun(commands.Cog):
 
     @commands.cooldown(2, 3)
     @commands.command(name= "8ball")
-    async def eightball(self, ctx, *, question: str= None):
+    async def eightball(self, ctx, *, question):
         """Ask the mystical 🎱 a question"""
-        def check(ctx2): return ctx2.author == ctx.author
-        
-        if question is None:
-            await self.bot.send("", "What do you want to ask the mystical 8ball? (c to cancel)")
-            
-            try: msg = await self.bot.wait_for("message", check= check, timeout= 15.0)
-            except commands.CommandInvokeError or TimeoutError: return await bot.send("", "Timed out")
-    
-            else: await self.bot.send(f":8ball: {question} :rabbit2:", r.choice(eightball_answers))
-        else: await self.bot.send(f":8ball: {question} :rabbit2:", r.choice(eightball_answers))
+        await ctx.send(embed= discord.Embed(
+            title= f":8ball: {question} :rabbit2:",
+            description= r.choice(eightball_answers),
+            color= r.randint(0, 0xFFFFFF)))
 
 
     @commands.command()
@@ -49,7 +43,9 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.cooldown(3, 6)
     async def hack(self, ctx, user: discord.User):
-        """Hack a user or bot (Why does everyone have russian passwords???)"""
+        """Hack a user or bot
+
+        Why does everyone have russian passwords lmao"""
         progresses = ["▯▯▯▯", "▮▯▯▯", "▮▮▯▯", "▮▮▮▯", "▮▮▮▮"]
         emails = ["icloud.com", "gmail.com", "yahoo.com", "mememail.com", "hotmail.com", "shaggy.org"]
         passwords = [

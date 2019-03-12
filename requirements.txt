@@ -2,6 +2,7 @@
 praw
 pillow
 asyncio
+humanize
 pyfiglet
 json-store-client
 git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py
