@@ -134,6 +134,7 @@ class Admin(commands.Cog):
 
     @todo.command()
     async def add(self, ctx, *, task):
+        await ctx.trigger_typing()
         msg=await self.bot.get_channel(551203556896538627).send(embed= discord.Embed(
             title= "Added to the to-do list:", description= task,
             color= discord.Colour.blurple()))
@@ -148,22 +149,20 @@ class Admin(commands.Cog):
         embed = discord.Embed(title= "To-do list", description= "", color= r.randint(0, 0xFFFFFF))
 
         async for msg in chnl.history():
-            if not msg.author.bot: pass # Some messages from me in there
-            
-            msg_data = {}
-            msg_data["upvotes"] = 0
+            if msg.author.bot: # Some messages from me in there
+                msg_data = {}
+                msg_data["upvotes"] = 0
 
-            msg_data["task"] = msg.embeds[0].description
-            for reaction in msg.reactions:
-                if str(reaction.emoji) == "👍":
-                    msg_data["upvotes"] += reaction.count
-                if str(reaction.emoji) == "👎":
-                    msg_data["upvotes"] -= reaction.count
-            
-            data.append(msg_data)
-
+                msg_data["task"] = msg.embeds[0].description
+                for reaction in msg.reactions:
+                    if str(reaction.emoji) == "👍":
+                        msg_data["upvotes"] += reaction.count
+                    if str(reaction.emoji) == "👎":
+                        msg_data["upvotes"] -= reaction.count
+                
+                data.append(msg_data)
         for task in sorted(data, key= lambda k: -k["upvotes"]):
-            embed.description += f"{task['upvotes']} upvotes - **{task['task']}**\n"
+            embed.description += f"{task['upvotes']} upvotes - **{task['task']}**\n\n"
         embed.set_footer(text= f"{len(data)} tasks on the to-do list")
         await ctx.send(embed= embed)
 
