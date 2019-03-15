@@ -8,8 +8,8 @@ from discord.ext import commands
 
 
 class Admin(commands.Cog):
+    """My precious, you can't have this"""
     def __init__(self, bot: commands.Bot): self.bot = bot
-
 
     # Loading and unloading cogs
     @commands.is_owner()

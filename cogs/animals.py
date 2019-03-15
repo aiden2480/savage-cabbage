@@ -5,7 +5,7 @@ from discord.ext import commands
 
 
 class Animals(commands.Cog):
-    """Class description"""
+    """Sends images of random animals from off the internet"""
     def __init__(self, bot): self.bot = bot
     
     @commands.command(aliases= ["purr", "kitty"])
@@ -53,16 +53,17 @@ class Animals(commands.Cog):
     @commands.command()
     @commands.cooldown(3, 3)
     async def panda(self, ctx):
-        """Look ma! Its a panda! 🐼"""
+        """Its a giant black and white cat! 🐼"""
         await ctx.trigger_typing() # I should get a less dodgy api but oh well (takes about 5 seconds on first scrape in a while)
         url = r.choice(["https://some-random-api.ml/pandaimg", "https://some-random-api.ml/redpandaimg"])
         async with self.bot.requester.get(url) as resp:
             data= json.loads(await resp.read())
         
-        embed= discord.Embed(title= "Look ma! Its a panda! 🐼", color= r.randint(0, 0xFFFFFF))
+        embed= discord.Embed(title= "Its a giant black and white cat! 🐼", color= r.randint(0, 0xFFFFFF))
         embed.set_image(url= data["link"])
         
         await ctx.send(embed= embed)
 
 
-def setup(bot): bot.add_cog(Animals(bot))
+def setup(bot: commands.Bot):
+    bot.add_cog(Animals(bot))

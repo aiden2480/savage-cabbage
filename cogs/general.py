@@ -7,13 +7,14 @@ from setup import emojis, change_status
 from setup import VERSION, RUN_TIME, BOT_INVITE_LINK, SUPPORT_GUILD_INVITE
 
 class General(commands.Cog):
+    """General info commands"""
     def __init__(self, bot):
         self.bot = bot
     
-    @commands.command(name='help')
-    @commands.cooldown(1, 3.0, type=commands.BucketType.member)
+    @commands.command(name= "help")
+    @commands.cooldown(1, 3.0)
     async def _help(self, ctx, *, command: str = None):
-        """Shows help about a command or the bot"""
+        """Stop it, get some help"""
 
         try:
             if command is None:
@@ -31,7 +32,9 @@ class General(commands.Cog):
 
             await p.paginate()
         except Exception as e:
-            await ctx.send(e)
+            if ctx.author != self.bot.admins[0]:
+                await ctx.send(e)
+            raise e
 
 
 
@@ -68,7 +71,7 @@ class General(commands.Cog):
     @commands.command()
     async def ping(self, ctx):
         """Check the bots latency 🏓"""
-        await ctx.send(f":ping_pong: Pong - **{str(int(self.bot.latency*1000))}**ms :ping_pong:")
+        await ctx.send(f":ping_pong: Pong - `{str(int(self.bot.latency* 1000))}ms` :ping_pong:")
 
 
     @commands.cooldown(2, 10)
@@ -82,6 +85,8 @@ class General(commands.Cog):
             await ctx.send(embed= discord.Embed(
                 description= "ok, my status is now **{0} {1}**".format(conversion[_[0]], _[1]),
                 color= r.randint(0, 0xFFFFFF)))
+        
+        # Admin status change
         elif ctx.author in self.bot.admins:
             embed= discord.Embed(title= "Admin status change", color= r.randint(0, 0xFFFFFF))
             try: _ = await change_status(self.bot, type_text= ({"playing": 0, "streaming": 1, "listeningto": 2, "watching": 3}[status[0]], " ".join(status[1:])))
@@ -112,18 +117,18 @@ class General(commands.Cog):
         await ctx.send(embed= discord.Embed(
             color= r.randint(0, 0xFFFFFF),
             title= "Suggestion recieved",
-            description= "We'll get back to you shortly"
-        ))
+            description= "We'll get back to you shortly"))
 
 
     @commands.command()
     @commands.cooldown(1, 5)
     async def invite(self, ctx):
         """Invite the bot or join my support server"""
-        await self.bot.send(
-            "**:mailbox_with_mail: Invite :homes:**",
-            f"""Invite me to your server [here]({BOT_INVITE_LINK})
-            Join my support server: {SUPPORT_GUILD_INVITE}""")
+        await ctx.send(embed= discord.Embed(
+            color= r.randint(0, 0xFFFFFF),
+            title= "**:mailbox_with_mail: Invite :homes:**",
+            description= f"""Invite me to your server [here]({BOT_INVITE_LINK})
+            Join my support server: {SUPPORT_GUILD_INVITE}"""))
     
 
     @commands.command()
@@ -138,7 +143,7 @@ class General(commands.Cog):
     @commands.command(aliases=["whois", "user-info"], disabled= True)
     async def userinfo(self, ctx, user: discord.Member):
         if user is None: user = ctx.author
-                
+        
         embed = discord.Embed(color=r.randint(0, 0xFFFFFF), title=f'User Info for {user.name}')
         embed.add_field(name='Status', value=f'{ctx.message.author.status}')       
         embed.add_field(name='Account Created', value=ctx.message.author.created_at.__format__('%A, %B %d, %Y'))
@@ -148,4 +153,5 @@ class General(commands.Cog):
         await ctx.send(embed= embed)
 
 
-def setup(bot): bot.add_cog(General(bot))
+def setup(bot: commands.Bot):
+    bot.add_cog(General(bot))

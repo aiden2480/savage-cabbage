@@ -6,8 +6,8 @@ from setup import emojis
 from discord.ext import commands
 
 class Currency(commands.Cog):
+    """Creating a currency system soon!"""
     def __init__(self, bot): self.bot, self.db = bot, json_store_client.Client(os.getenv("DATABASE_URL"))
-    
 
     @commands.command()
     @commands.cooldown(1, 86400)
@@ -28,6 +28,6 @@ class Currency(commands.Cog):
 
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     return # Still working on this
     bot.add_cog(Currency(bot))

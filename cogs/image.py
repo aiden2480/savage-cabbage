@@ -5,10 +5,13 @@ from io import BytesIO
 from typing import Union
 from functools import partial
 from discord.ext import commands
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image as PIL_Image
+from PIL import ImageDraw as PIL_ImageDraw
+from PIL import ImageFont as PIL_ImageFont
 
 
 class Image(commands.Cog):
+    """Image manipulation"""
     def __init__(self, bot: commands.Bot): self.bot, self.session= bot, aiohttp.ClientSession(loop= bot.loop)
 
     async def get_avatar(self, user: Union[discord.User, discord.Member]) -> bytes:
@@ -18,11 +21,11 @@ class Image(commands.Cog):
 
     @staticmethod
     def processing(avatar_bytes: bytes, colour: tuple) -> BytesIO:
-        with Image.open(BytesIO(avatar_bytes)) as im:
-            with Image.new("RGB", im.size, colour) as background:
+        with PIL_Image.open(BytesIO(avatar_bytes)) as im:
+            with PIL_Image.new("RGB", im.size, colour) as background:
                 rgb_avatar = im.convert("RGB")
-                with Image.new("L", im.size, 0) as mask:
-                    mask_draw = ImageDraw.Draw(mask)
+                with PIL_Image.new("L", im.size, 0) as mask:
+                    mask_draw = PIL_ImageDraw.Draw(mask)
                     mask_draw.ellipse([(0, 0), im.size], fill= 255)
                     background.paste(rgb_avatar, (0, 0), mask= mask)
                 final_buffer = BytesIO()
@@ -37,15 +40,17 @@ class Image(commands.Cog):
         member = member or ctx.author
 
         async with ctx.typing():
-            if isinstance(member, discord.Member): member_colour = member.colour.to_rgb()
-            else: member_colour = (0, 0, 0)
+            if isinstance(member, discord.Member):
+                member_colour = member.colour.to_rgb()
+            else:
+                member_colour = (0, 0, 0)
             
             avatar_bytes = await self.get_avatar(member)
             fn = partial(self.processing, avatar_bytes, member_colour)
             final_buffer = await self.bot.loop.run_in_executor(None, fn)
             
-            file = discord.File(filename="circle.png", fp=final_buffer)
-            await ctx.send(file=file)
+            file = discord.File(filename= "circle.jpg", fp= final_buffer)
+            await ctx.send(file= file)
     
     """
     @commands.command()
@@ -85,4 +90,5 @@ class Image(commands.Cog):
     """     
 
 
-def setup(bot): bot.add_cog(Image(bot))
+def setup(bot: commands.Bot):
+    bot.add_cog(Image(bot))

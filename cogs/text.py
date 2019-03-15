@@ -4,6 +4,7 @@ from setup import emojis
 from discord.ext import commands
 
 class Text(commands.Cog):
+    """Commands to do with text manipulation"""
     def __init__(self, bot): self.bot = bot
     
     

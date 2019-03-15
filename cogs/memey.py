@@ -12,6 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 from setup import greetings, roasts, roasts_str, aiohttpget
 
 class Memey(commands.Cog):
+    """MEMEZZZZ"""
     def __init__(self, bot):
         self.bot = bot
         self.reddit = praw.Reddit(

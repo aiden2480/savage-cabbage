@@ -5,6 +5,7 @@ from discord.ext import commands
 from setup import eightball_answers
 
 class Fun(commands.Cog):
+    """Fun commands!"""
     def __init__(self, bot): self.bot = bot
 
     @commands.cooldown(2, 3)
@@ -41,7 +42,7 @@ class Fun(commands.Cog):
 
 
     @commands.command()
-    @commands.cooldown(3, 6)
+    @commands.cooldown(3, 3)
     async def hack(self, ctx, user: discord.User):
         """Hack a user or bot
 

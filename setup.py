@@ -114,7 +114,7 @@ async def change_status(bot, *, type_text: tuple = None):
         (3, f"{bot.admins[0]} code!"),
     ])
 
-    type_text = (int(type_text[0]), type_text[1])
+    type_text = (int(type_text[0]), type_text[1]+ " || $help")
     if type_text[0] == 0: activity = discord.Game(name= type_text[1])
     if type_text[0] == 1: activity = discord.Streaming(name= type_text[1], url= "https://twitch.tv/chocolatejade42")
     if type_text[0] == 2: activity = discord.Activity(type= discord.ActivityType.listening, name= type_text[1])

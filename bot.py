@@ -62,11 +62,12 @@ async def on_guild_join(guild):
     embed = discord.Embed(
         title= "Guild join",
         color= 0x228B22,
-        description= f"Joined **{guild.name}** (**{guild.member_count- 1}** other members)")
+        description= f"Joined **{guild.name}** (**{guild.member_count}** members)")
     
     embed.set_thumbnail(url= guild.icon_url)
     embed.add_field(name= "Guild Members", value= guild.member_count)
     embed.add_field(name= "New Total Guilds", value= len(bot.guilds))
+    embed.set_footer(text= f"Guild owner: {guild.owner}", icon_url= guild.owner.avatar_url)
 
     await bot.get_channel(542474215282966549).send(embed= embed)
 
@@ -77,11 +78,12 @@ async def on_guild_remove(guild):
     embed = discord.Embed(
         title= "Kicked from guild",
         color= 0xf44e42,
-        description= f"Kicked from **{guild.name}** (**{guild.member_count- 1}** other members)")
+        description= f"Kicked from **{guild.name}** (**{guild.member_count}** members)")
     
     embed.set_thumbnail(url= guild.icon_url)
     embed.add_field(name= "Guild Members", value= guild.member_count)
     embed.add_field(name= "New Total Guilds", value= len(bot.guilds))
+    embed.set_footer(text= f"Guild owner: {guild.owner}", icon_url= guild.owner.avatar_url)
 
     await bot.get_channel(542474215282966549).send(embed= embed)
 
@@ -153,10 +155,10 @@ async def on_command_error(ctx, error):
             await msg.delete()
         else: pass # User trying to use disabled command
     elif isinstance(error, commands.NoPrivateMessage):
-        await ctx.send("um, this appears to be a `guild-only` command!")
+        await ctx.send("lol u can't do this in a DM, its a `guild-only` command")
     elif isinstance(error, commands.CommandOnCooldown):
-        wait_time = str(str(error).strip("You are on cooldown. Try again in ")).strip("s")
-        readable_wait_time = format_cooldown_wait(float(wait_time))
+        wait_time = str(error).replace("You are on cooldown. Try again in ", "")[:-1] # Remove last 's' character
+        readable_wait_time = format_cooldown_wait(float(wait_time)) # Precise counting
         if readable_wait_time == "now": readable_wait_time = "a second"
 
         if user_in_support_guild(bot, ctx.message.author):

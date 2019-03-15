@@ -408,7 +408,7 @@ class HelpPaginator(Pages):
                 icon_url= self.bot.user.avatar_url)
 
     async def show_help(self):
-        """shows this message"""
+        """Stop it, get some help."""
 
         self.embed.title = "Paginator help"
         self.embed.description = "Hello! Welcome to the help page."

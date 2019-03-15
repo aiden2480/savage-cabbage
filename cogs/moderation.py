@@ -6,6 +6,7 @@ from setup import emojis
 from discord.ext import commands
 
 class Moderation(commands.Cog):
+    """Doing my bit to keep discord safe 🚨"""
     def __init__(self, bot): self.bot, self.db = bot, json_store_client.Client(os.getenv("DATABASE_URL"))
 
     @commands.guild_only()
@@ -27,6 +28,6 @@ class Moderation(commands.Cog):
         else: await ctx.send("You need `manage server` perms to change the prefix!")
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     return # Still trying to get the database to work so you'll have to wait
     bot.add_cog(Moderation(bot))

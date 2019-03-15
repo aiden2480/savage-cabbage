@@ -46,7 +46,7 @@ def invite(): return flask.render_template("redirect.html",
     redirect= BOT_INVITE_LINK,
     website_homepage= WEBSITE_HOMEPAGE,
     embed_title= "Invite Savage Cabbage to your server!",
-    embed_description= "yay!",
+    embed_descripton= "yay!",
 )
 
 @web.route("/server-invite") # Redirect link
