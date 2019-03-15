@@ -24,26 +24,26 @@ class Memey(commands.Cog):
     # Roasting
     @commands.group(aliases= ["burn", "bully"])
     @commands.cooldown(2, 3)
-    async def roast(self, ctx):
+    async def roast(self, ctx, user: discord.User= None):
         """Really badly piss off someone"""
-        if ctx.invoked_subcommand is None: # Roast self (idk why u would though)
+        if user is None: # Roast self (idk why u would though)
             await ctx.send(embed= discord.Embed(
                 title= f"{r.choice(greetings)} {ctx.author.name},",
                 description= r.choice(roasts),
                 color= r.randint(0, 0xFFFFFF)
             ))
         
-        if ctx.subcommand_passed is discord.User: # Roast another user (that's more like it)
+        if user is discord.User or discord.Member: # Roast another user (that's more like it)
             await ctx.send(embed= discord.Embed(
-                title= f"{r.choice(greetings)} {str(ctx.subcommand_passed)},",
+                title= f"{r.choice(greetings)} {str(user)},",
                 description= r.choice(roasts),
                 color= r.randint(0, 0xFFFFFF)
             ))
     
     #################################### NEED TO FIX ####################################
-    @roast.command(name= "list")
+    """@roast.command(name= "list")
     async def _list(self, ctx, page: int = 1):
-        num_of_pages, left_over= divmod(len(pages), 5)
+        num_of_pages, left_over= divmod(len(page), 5)
         if left_over: num_of_pages += 1
         if page not in range(1, num_of_pages+1): return await ctx.send(embed= discord.Embed(description= f"Invalid page number (pick from 1-{num_of_pages}", color= r.randint(0, 0xFFFFFF)))
 
@@ -53,7 +53,7 @@ class Memey(commands.Cog):
             color= r.randint(0, 0xFFFFFF))
 
         embed.set_footer(f"Page **{page}** of **{num_of_pages}**")
-        await ctx.send(embed= embed)
+        await ctx.send(embed= embed)"""
 
 
     """
