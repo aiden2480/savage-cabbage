@@ -33,9 +33,9 @@ class Memey(commands.Cog):
                 color= r.randint(0, 0xFFFFFF)
             ))
         
-        if user is discord.User or discord.Member: # Roast another user (that's more like it)
+        elif user is discord.User or discord.Member: # Roast another user (that's more like it)
             await ctx.send(embed= discord.Embed(
-                title= f"{r.choice(greetings)} {str(user)},",
+                title= f"{r.choice(greetings)} {str(user.name)},",
                 description= r.choice(roasts),
                 color= r.randint(0, 0xFFFFFF)
             ))
