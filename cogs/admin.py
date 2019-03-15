@@ -124,7 +124,6 @@ class Admin(commands.Cog):
     
 
     # To-do list
-    @commands.is_owner()
     @commands.group(hidden= True)
     async def todo(self, ctx):
         if ctx.invoked_subcommand is None:
@@ -133,6 +132,7 @@ class Admin(commands.Cog):
                 color= r.randint(0, 0xFFFFFF)))
 
     @todo.command()
+    @commands.is_owner()
     async def add(self, ctx, *, task):
         await ctx.trigger_typing()
         msg=await self.bot.get_channel(551203556896538627).send(embed= discord.Embed(
