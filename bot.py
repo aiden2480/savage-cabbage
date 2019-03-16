@@ -25,9 +25,13 @@ async def on_ready():
     """My async setup function"""
 
     bot.initial_cogs = [
-        "general", "fun", # "currency", # Still fixing currency, hold on
+        # Command Cogs
+        "general", "fun", # "currency",
         "memey", "text", "admin", "image",
-        "animals", # "moderation", # Need the db in here too so thats a dud also
+        "animals", # "moderation",
+        
+        # Util cogs
+        "assets.periodic"
     ]
 
     bot.remove_command("help")
@@ -112,29 +116,38 @@ async def on_command(ctx):
 
 @bot.event
 async def on_message(m: discord.Message):
+    await bot.wait_until_ready()
+    print(m.author, m.author.avatar_url)
+
     if m.author == bot.user or    \
         m.author in bot.banlist or \
                 m.author.bot == True: return
 
-    if m.content in ["no u", "のう"]:
-        try: await m.channel.send(m.content)
-        except: pass
+    #if m.content in ["no u", "のう"]:
+    #    try: await m.channel.send(m.content)
+    #   except: pass
 
     await bot.process_commands(m)
 
 
 # Error events
 @bot.event
-async def on_command_error(ctx, error):
-    """Handle errors"""
-    
+async def on_command_error(ctx: commands.Context, error):
+    """Main error handler"""
+    if getattr(ctx, "error_handled", False):
+        return # Error handled already in custom function
+
+    ignored_errors = ()
     embed = discord.Embed(color= r.randint(0, 0xFFFFFF))
-    ignored_errors = (commands.NotOwner, commands.CommandNotFound)
     missing_param_errors = (commands.MissingRequiredArgument, commands.BadArgument, commands.TooManyArguments, commands.UserInputError)
     
-
     if isinstance(error, ignored_errors):
         pass
+    elif isinstance(error, commands.NotOwner):
+        if ctx.author in bot.admins: # Bot admins can use these
+            await ctx.invoke()
+        else: # Non-admin
+            print("hi")
     elif isinstance(error, missing_param_errors):
         await ctx.send(embed= discord.Embed(
             color= r.randint(0, 0xFFFFFF),

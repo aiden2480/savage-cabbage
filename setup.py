@@ -60,13 +60,6 @@ async def prefix(bot, message):
     
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
-#def tb_to_str(tb):
-#    """Takes a traceback and turns it into a string"""
-#    _= ""
-#    for line in TracebackException(
-#        type(tb[0]), tb[1], tb[2]
-#    ).format(chain= True): _+= line
-#    return _
 
 def get_time():
     """Time in format DD/MM/YYYY HH:MM:SS (str)"""
@@ -84,7 +77,8 @@ def format_cooldown_wait(seconds: float):
 	return humanize.naturaltime(diff)    
 
 async def change_status(bot, *, type_text: tuple = None):
-    """Change the bot's playing status"""
+    """Change the bot's playing status
+    RETURNS tuple (type, text)"""
     if type_text == None: type_text= r.choice([
         # Playing
         (0, "Tetris"),
@@ -110,15 +104,20 @@ async def change_status(bot, *, type_text: tuple = None):
         
         # Watching
         (3, "out for nonces"),
-        # (3, "Hamezza on YouTube"),
+        (3, "Hamezza on YouTube"),
         (3, f"{bot.admins[0]} code!"),
     ])
 
-    type_text = (int(type_text[0]), type_text[1]+ " || $help")
-    if type_text[0] == 0: activity = discord.Game(name= type_text[1])
-    if type_text[0] == 1: activity = discord.Streaming(name= type_text[1], url= "https://twitch.tv/chocolatejade42")
-    if type_text[0] == 2: activity = discord.Activity(type= discord.ActivityType.listening, name= type_text[1])
-    if type_text[0] == 3: activity = discord.Activity(type= discord.ActivityType.watching, name= type_text[1])
+    type_text = (int(type_text[0]), type_text[1]+ " || $help") # Reformat
+
+    if type_text[0] == 0:
+        activity = discord.Game(name= type_text[1])
+    if type_text[0] == 1:
+        activity = discord.Streaming(name= type_text[1], url= "https://twitch.tv/chocolatejade42")
+    if type_text[0] == 2:
+        activity = discord.Activity(type= discord.ActivityType.listening, name= type_text[1])
+    if type_text[0] == 3:
+        activity = discord.Activity(type= discord.ActivityType.watching, name= type_text[1])
  
     await bot.change_presence(activity= activity)
     return type_text
@@ -149,8 +148,8 @@ VERSION = list(UPDATE_LOG)[0]
 WEBSITE_HOMEPAGE = "https://savage-cabbage.herokuapp.com"
 SOURCE_CODE = "https://github.com/aiden2480/savage-cabbage"
 SUPPORT_GUILD_INVITE = SUPPORT_SERVER_INVITE = "https://discord.gg/AJj45Sj"
-BOT_INVITE_LINK = discord.utils.oauth_url(492873992982757406, permissions= discord.Permissions(201641024), redirect_uri= SUPPORT_GUILD_INVITE)
-# Permissions: add_reactions, attach_files, change_nickname, embed_links, external_emojis, manage_nicknames, read_messages, send_messages
+BOT_INVITE_LINK = discord.utils.oauth_url(492873992982757406, permissions= discord.Permissions(134540352), redirect_uri= SUPPORT_GUILD_INVITE)
+# Permissions: add_reactions, attach_files, embed_links, external_emojis, manage_messages, manage_nicknames, read_messages, send_messages
 
 
 # Long lists

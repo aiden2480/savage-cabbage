@@ -253,9 +253,6 @@ async def _can_run(cmd, ctx):
 
 
 def _command_signature(cmd):
-    # this is modified from discord.py source
-    # which I wrote myself lmao
-
     result = [cmd.qualified_name]
     if cmd.usage:
         result.append(cmd.usage)
@@ -299,14 +296,14 @@ class HelpPaginator(Pages):
         cog_name = cog.__class__.__name__
 
         # get the commands
-        entries = sorted(ctx.bot.get_cog_commands(cog_name), key=lambda c: c.name)
+        entries = sorted(cog.get_commands(), key= lambda c: c.name) # sorted(ctx.bot.get_cog_commands(cog_name), key= lambda c: c.name)
 
         # remove the ones we can't run
-        entries = [cmd for cmd in entries if (await _can_run(cmd, ctx)) and not cmd.hidden]
+        entries = [cmd for cmd in entries if (await _can_run(cmd, ctx)) and cmd.enabled and not cmd.hidden]
 
         self = cls(ctx, entries)
         self.title = f"{cog_name} Commands"
-        self.description = inspect.getdoc(cog)
+        self.description = inspect.getdoc(cog) + f"\n\nFor more help, [join the support server]({SUPPORT_GUILD_INVITE})"
         self.prefix = cleanup_prefix(ctx.bot, ctx.prefix)
 
         # no longer need the database
@@ -321,7 +318,7 @@ class HelpPaginator(Pages):
         except AttributeError:
             entries = []
         else:
-            entries = [cmd for cmd in entries if (await _can_run(cmd, ctx)) and not cmd.hidden]
+            entries = [cmd for cmd in entries if (await _can_run(cmd, ctx)) and cmd.enabled and not cmd.hidden]
 
         self = cls(ctx, entries)
         self.title = command.signature
@@ -379,7 +376,7 @@ class HelpPaginator(Pages):
     def get_bot_page(self, page):
         cog, description, commands = self.entries[page - 1]
         self.title = f"{cog} Commands"
-        self.description = description
+        self.description = description + f"\n\nFor more help, [join the support server]({SUPPORT_GUILD_INVITE})"
         return commands
 
     def prepare_embed(self, entries, page, *, first=False):
@@ -388,8 +385,10 @@ class HelpPaginator(Pages):
         self.embed.title = self.title
 
         if hasattr(self, "_is_bot"):
-            value = f"For more help, [join the support server]({SUPPORT_GUILD_INVITE})"
-            self.embed.add_field(name= "More help", value= value, inline=False)
+            # value = f"For more help, [join the support server]({SUPPORT_GUILD_INVITE})"
+            # self.embed.add_field(name= "More help", value= value, inline=False)
+            # Added just above
+            pass
 
         self.embed.set_footer(text=f'Use "{self.prefix}help command" for more info on a command.')
 

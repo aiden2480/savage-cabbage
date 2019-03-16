@@ -166,6 +166,14 @@ class Admin(commands.Cog):
         embed.set_footer(text= f"{len(data)} tasks on the to-do list")
         await ctx.send(embed= embed)
 
+    @todo.error
+    async def todo_error_handler(self, ctx, error):
+        print(error)
+        print(error.type)
+        if isinstance(error, commands.NotOwner):
+            await ctx.send(f"This is an owner-only command! Use `{ctx.prefix}suggest <suggestion>` instead")
+            ctx.error_handled = True
+
 
     # Check servers
     @commands.is_owner()
@@ -184,7 +192,7 @@ class Admin(commands.Cog):
     # Check last updates and commits
     @commands.is_owner()
     @commands.command(hidden= True)
-    async def updates(self, ctx: commands.Context):
+    async def updates(self, ctx):
         """Get the most recent updates from GitHub (Move to public access?)"""
         await ctx.trigger_typing()
 
@@ -223,6 +231,28 @@ class Admin(commands.Cog):
             embed.description += f"{usr}, ID {ban[0]}. Banned for **{ban[1]}**\n\n"
         
         await ctx.send(embed= embed)
+
+
+    # Evaluate stuff as another user
+    @commands.is_owner()
+    @commands.command(hidden= True)
+    async def eval(self, ctx, user: discord.Member, *, command: str):
+        """Evaluate commands as another user"""
+        ctx.message.author = user
+        ctx.message.content = f"{ctx.prefix}{command}"
+        await self.bot.process_commands(ctx.message)
+
+
+    # Leave the server in case of an emergency
+    @commands.is_owner()
+    @commands.command(hidden= True)
+    async def leave(self, ctx, guild_id= None):
+        if guild_id is None:
+            await ctx.guild.leave()
+        else:
+            g = await self.bot.get_guild(guild_id)
+            await g.leave()
+
 
     # Shutdown the bot
     @commands.is_owner()

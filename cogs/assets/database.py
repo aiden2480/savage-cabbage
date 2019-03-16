@@ -2,18 +2,18 @@
 Database code that I use to try and connect to my online database, hopefully it works!
 """
 
-
 import os
 import json
 import discord
 import aiohttp
 import asyncio
-from cogs.assets import custombot
+from discord.ext import commands
 
 
 # Main Class
 class Database:
-    def __init__(self, bot: custombot.CustomBot):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
         self.base_url = os.getenv("DATABASE_URL")
     
 
@@ -37,6 +37,6 @@ class Database:
         return f"{self.base_url}/{key}"
     
     async def __user_in_db_check__(self, user: discord.User):
-    """Checks that a user has run a command before and is in my database, if not, adds them to it"""
+        """Checks that a user has run a command before and is in my database, if not, adds them to it"""
         async with self.bot.requester.get(self.__format_url__(f"users/{user.id}")) as response:
             print(json.loads(await response.read()))

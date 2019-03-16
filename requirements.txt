@@ -1,10 +1,11 @@
 # Bot
-praw
-pillow
+praw # Memey
+dblpy # Periodic
+pillow # Image
 asyncio
-humanize
-pyfiglet
-json-store-client
+humanize # Error handling
+pyfiglet # Fun
+json-store-client # Db requests
 git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py
 
 # Server
