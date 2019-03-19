@@ -130,7 +130,7 @@ async def aiohttpget(url):
 
 # Lambdas
 random_colour = lambda: r.randint(0, 0xFFFFFF)
-user_in_support_guild = lambda bot, user: user in bot.get_guild(496081601755611137).members
+user_in_support_guild = lambda bot, user: user in bot.fetch_guild(496081601755611137).members
 format_error = lambda error: "\n".join(traceback.format_exception(type(error), error, error.__traceback__, 10))
 
 

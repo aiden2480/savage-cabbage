@@ -63,7 +63,7 @@ async def setup_info(bot):
     while True:
         await asyncio.sleep(1500) # Refresh every half hour
 
-        bot.admins = [await bot.get_user_info(admin) for admin in [
+        bot.admins = [await bot.fetch_user(admin) for admin in [
             272967064531238912, # Me
             454928254558535700, # Dana
             297229962971447297, # Jack

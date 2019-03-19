@@ -227,7 +227,7 @@ class Admin(commands.Cog):
     async def botbans(self, ctx):
         embed= discord.Embed(title= "Bot bans", description= "", color= r.randint(0, 0xFFFFFF))
         for ban in self.bot.banlist:
-            usr= await self.bot.get_user_info(ban[0])
+            usr= await self.bot.fetch_user(ban[0])
             embed.description += f"{usr}, ID {ban[0]}. Banned for **{ban[1]}**\n\n"
         
         await ctx.send(embed= embed)
@@ -251,7 +251,7 @@ class Admin(commands.Cog):
             await ctx.send(embed= discord.Embed(description= "Cya! :wave:", color= r.randint(0, 0xFFFFFF)))
             await ctx.guild.leave()
         else:
-            g = self.bot.get_guild(int(guild_id))
+            g = self.bot.fetch_guild(int(guild_id))
             await ctx.send(embed= discord.Embed(description= f"Cya! :wave: **Left {g.name}**", color= r.randint(0, 0xFFFFFF)))
             await g.leave()
 

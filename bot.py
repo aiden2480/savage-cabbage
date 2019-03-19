@@ -35,7 +35,7 @@ async def on_ready():
     ]
 
     bot.remove_command("help")
-    bot.admins = [await bot.get_user_info(admin) for admin in [
+    bot.admins = [await bot.fetch_user(admin) for admin in [
         272967064531238912, # Me
         454928254558535700, # Dana
         297229962971447297, # Jack
@@ -52,7 +52,7 @@ async def on_ready():
     bot.no_bypass_cooldown_commands = ["daily"]
     bot.requester = aiohttp.ClientSession()
     bot.current_status = await change_status(bot)
-    for ban in await bot.get_guild(496081601755611137).bans(): bot.banlist.append((ban.user.id, ban.reason))
+    for ban in await bot.fetch_guild(496081601755611137).bans(): bot.banlist.append((ban.user.id, ban.reason))
     # bot.serverprefixes = json.loads(requests.get(os.getenv("DATABASE_URL")+"/server-prefixes").text)["result"] # Change from requests though this first time might be ok
     print(f"Logged in as {bot.user} - {len(list(bot.get_all_members()))} users across {len(bot.guilds)} guilds - Loaded in {round(time.time()- _runtime_, 2)} seconds")
     if bot.user.id == 492873992982757406: await bot.get_channel(542961329867063326).send(embed= discord.Embed(title= "Bot restarted", description= f"Loaded in {round(time.time()- _runtime_, 2)} seconds\n\nRestarted: {get_time()}", color= 0x00BFFF))
