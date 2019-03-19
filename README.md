@@ -1,5 +1,5 @@
 # Savage Cabbage
-[![Discord Bots](https://discordbots.org/api/widget/status/492873992982757406.svg)](https://discordbots.org/bot/492873992982757406) [![support-server](https://img.shields.io/discord/496081601755611137.svg)](https://discord.gg/AJj45Sj) ![last-update](https://img.shields.io/github/last-commit/aiden2480/savage-cabbage.svg) [![version](https://img.shields.io/badge/python-3.7.2-blue.svg)](https://www.python.org/downloads/release/python-372/) ![repo-size](https://img.shields.io/github/repo-size/aiden2480/savage-cabbage.svg) [![license](https://img.shields.io/github/license/aiden2480/savage-cabbage.svg)](LICENSE)
+[![Discord Bots](https://discordbots.org/api/widget/status/492873992982757406.svg)](https://discordbots.org/bot/492873992982757406) [![support-server](https://img.shields.io/discord/496081601755611137.svg)](https://discord.gg/AJj45Sj) [![last-update](https://img.shields.io/github/last-commit/aiden2480/savage-cabbage.svg)](https://github.com/aiden2480/savage-cabbage/graphs/contributors) [![version](https://img.shields.io/badge/python-3.7.2-blue.svg)](https://www.python.org/downloads/release/python-372/) [![repo-size](https://img.shields.io/github/repo-size/aiden2480/savage-cabbage.svg)](https://github.com/aiden2480/savage-cabbage) [![license](https://img.shields.io/github/license/aiden2480/savage-cabbage.svg)](LICENSE)
 
 
 ## About the bot
