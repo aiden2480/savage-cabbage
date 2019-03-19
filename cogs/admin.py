@@ -248,9 +248,11 @@ class Admin(commands.Cog):
     @commands.command(hidden= True)
     async def leave(self, ctx, guild_id= None):
         if guild_id is None:
+            await ctx.send(embed= discord.Embed(description= "Cya! :wave:", color= r.randint(0, 0xFFFFFF)))
             await ctx.guild.leave()
         else:
-            g = await self.bot.get_guild(guild_id)
+            g = self.bot.get_guild(int(guild_id))
+            await ctx.send(embed= discord.Embed(description= f"Cya! :wave: **Left {g.name}**", color= r.randint(0, 0xFFFFFF)))
             await g.leave()
 
 

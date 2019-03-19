@@ -98,7 +98,7 @@ async def change_status(bot, *, type_text: tuple = None):
 
         # Listening to
         (2, "ASMR"),
-        (2, "the voices in my head"),
+        # (2, "the voices in my head"),
         (2, "desu desu desu 10 hours"),
         (2, "my dev banging his head on the keyboard"),
         

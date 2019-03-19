@@ -74,4 +74,4 @@ def setup(bot: Bot):
     bot.loop.create_task(setup_info(bot))
 
     # bot.add_cog(DiscordBotsOrgAPI(bot)) # No token yet
-    # bot.add_cog(DiscordBotsListComAPI(bot))
+    # bot.add_cog(DiscordBotsListComAPI(bot)) # Not posting for some reason

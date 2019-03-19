@@ -117,15 +117,10 @@ async def on_command(ctx):
 @bot.event
 async def on_message(m: discord.Message):
     await bot.wait_until_ready()
-    print(m.author, m.author.avatar_url)
 
     if m.author == bot.user or    \
         m.author in bot.banlist or \
                 m.author.bot == True: return
-
-    #if m.content in ["no u", "のう"]:
-    #    try: await m.channel.send(m.content)
-    #   except: pass
 
     await bot.process_commands(m)
 
