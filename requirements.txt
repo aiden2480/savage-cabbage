@@ -6,7 +6,7 @@ pillow==5.4.1
 asyncio==3.4.3
 humanize==0.5.1
 json-store-client==1.0.1
-git+https://github.com/Rapptz/discord.py@d221ca5f7de98119d81dd113492525ecd2a5f06c#egg=discord.py
+git+https://github.com/Rapptz/discord.py@c30a366106f9d6114dcf38a31aed58dec6747054#egg=discord.py
 # Having this same commit accross local and hosting allows for no outdates local changes
 
 # Server
