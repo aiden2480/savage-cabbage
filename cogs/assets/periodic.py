@@ -39,7 +39,7 @@ class DiscordBotsOrgAPI(Cog):
     """Handles interactions with the discordbots.org API"""
 
     def __init__(self, bot):
-        self.bot, self.token = bot, os.getenv("DBL_TOKEN")
+        self.bot, self.token = bot, os.getenv("DISCORDBOTSORG_TOKEN")
         self.dblpy = dbl.Client(self.bot, self.token)
         self.bot.loop.create_task(self.update_stats())
 
@@ -73,5 +73,5 @@ async def setup_info(bot):
 def setup(bot: Bot):
     bot.loop.create_task(setup_info(bot))
 
-    # bot.add_cog(DiscordBotsOrgAPI(bot)) # No token yet
+    bot.add_cog(DiscordBotsOrgAPI(bot))
     # bot.add_cog(DiscordBotsListComAPI(bot)) # Not posting for some reason

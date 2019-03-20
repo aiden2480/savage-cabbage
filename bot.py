@@ -9,10 +9,11 @@ import random as r
 from setup import *
 from discord.ext import commands
 from cogs.assets import keepalive
+from cogs.assets import custombot
 
 
 _runtime_ = time.time()
-bot = commands.Bot(
+bot = custombot.CustomBot(
     command_prefix= prefix,
     status= discord.Status.idle,
     owner_id= 272967064531238912,
@@ -23,16 +24,6 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     """My async setup function"""
-
-    bot.initial_cogs = [
-        # Command Cogs
-        "general", "fun", # "currency",
-        "memey", "text", "admin", "image",
-        "animals", # "moderation",
-        
-        # Util cogs
-        "assets.periodic"
-    ]
 
     bot.remove_command("help")
     bot.admins = [await bot.fetch_user(admin) for admin in [
@@ -48,9 +39,6 @@ async def on_ready():
             print(f"Could not load cog {cog}: {e}")
             await bot.get_channel(546570094449393665).send(f"{bot.admins[0].mention}, cog **{cog}** could not be loaded", embed= discord.Embed(description= f"```py\n{e}```", color= r.randint(0, 0xFFFFFF)))
 
-    bot.commands_run = bot.non_admin_commands_run = 0
-    bot.banlist, bot.serverprefixes= [], []
-    bot.no_bypass_cooldown_commands = ["daily"]
     bot.requester = aiohttp.ClientSession()
     
     g = await bot.fetch_guild(496081601755611137)

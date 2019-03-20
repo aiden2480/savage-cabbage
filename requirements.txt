@@ -1,15 +1,15 @@
 # Bot
-praw
-dblpy
-pillow
-asyncio
-humanize
-pyfiglet
-json-store-client
+praw==6.1.1
+dblpy==0.1.6
+pillow==5.4.1
+pyfiglet==0.8
+asyncio==3.4.3
+humanize==0.5.1
+json-store-client==1.0.1
 git+https://github.com/Rapptz/discord.py@d221ca5f7de98119d81dd113492525ecd2a5f06c#egg=discord.py
 # Having this same commit accross local and hosting allows for no outdates local changes
 
 # Server
-Flask
-gunicorn
 Werkzeug
+Flask==1.0.2
+gunicorn==19.9.0
