@@ -1,12 +1,13 @@
 # Bot
-praw # Memey
-dblpy # Periodic
-pillow # Image
+praw
+dblpy
+pillow
 asyncio
-humanize # Error handling
-pyfiglet # Fun
-json-store-client # Db requests
-git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py
+humanize
+pyfiglet
+json-store-client
+git+https://github.com/Rapptz/discord.py@d221ca5f7de98119d81dd113492525ecd2a5f06c#egg=discord.py
+# Having this same commit accross local and hosting allows for no outdates local changes
 
 # Server
 Flask
