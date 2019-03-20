@@ -104,7 +104,7 @@ async def on_command(ctx):
     print(f"Command run: {ctx.author}: {ctx.message.content}")
     if ctx.author not in bot.admins: bot.non_admin_commands_run += 1
 
-@bot.event
+# @bot.event # Use default
 async def on_message(m: discord.Message):
     await bot.wait_until_ready()
 
@@ -131,8 +131,7 @@ async def on_command_error(ctx: commands.Context, error):
     elif isinstance(error, commands.NotOwner):
         if ctx.author in bot.admins: # Bot admins can use these
             await ctx.invoke()
-        else: # Non-admin
-            print("hi")
+        else: pass
     elif isinstance(error, missing_param_errors):
         await ctx.send(embed= discord.Embed(
             color= r.randint(0, 0xFFFFFF),
@@ -141,7 +140,8 @@ async def on_command_error(ctx: commands.Context, error):
         ))
     elif isinstance(error, commands.CommandNotFound):
         if ctx.guild != None: # DM commands don't need prefix
-            await ctx.send(f"thats not a command lol {emojis.partyparrot}")
+            pass # Changed my mind about it
+            # await ctx.send(f"thats not a command lol {emojis.partyparrot}")
     elif isinstance(error, commands.DisabledCommand):
         if ctx.author.id == bot.admins[0].id:
             ctx.command.disabled = False
