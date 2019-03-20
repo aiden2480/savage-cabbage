@@ -104,7 +104,7 @@ async def on_command(ctx):
     print(f"Command run: {ctx.author}: {ctx.message.content}")
     if ctx.author not in bot.admins: bot.non_admin_commands_run += 1
 
-# @bot.event # Use default
+"""@bot.event # Use default
 async def on_message(m: discord.Message):
     await bot.wait_until_ready()
 
@@ -112,7 +112,7 @@ async def on_message(m: discord.Message):
         m.author in bot.banlist or \
                 m.author.bot == True: return
 
-    await bot.process_commands(m)
+    await bot.process_commands(m)"""
 
 
 # Error events
