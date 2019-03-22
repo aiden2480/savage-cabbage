@@ -12,7 +12,7 @@ class Animals(commands.Cog):
     @commands.cooldown(3, 3)
     async def cat(self, ctx):
         """Its a kitty! 🐱"""
-        await ctx.trigger_typing()
+        await ctx.trigger_typing() # Add https://cataas.com/cat and https://cataas.com/cat/gif
         async with self.bot.requester.get("http://aws.random.cat/meow") as resp:
             url= json.loads(await resp.read())["file"]
         

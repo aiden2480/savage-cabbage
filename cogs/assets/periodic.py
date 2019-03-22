@@ -1,5 +1,4 @@
 import os
-import dbl
 import json
 import asyncio
 import aiohttp
@@ -40,19 +39,24 @@ class DiscordBotsOrgAPI(Cog):
 
     def __init__(self, bot):
         self.bot, self.token = bot, os.getenv("DISCORDBOTSORG_TOKEN")
-        self.dblpy = dbl.Client(self.bot, self.token)
         self.bot.loop.create_task(self.update_stats())
 
     async def update_stats(self):
         """This function runs every 30 minutes to automatically update your server count"""
+        session= aiohttp.ClientSession(loop= self.bot.loop)
 
         while True:
-            try:
-                await self.dblpy.post_server_count()
-                print('posted server count ({})'.format(len(self.bot.guilds)))
-            except Exception as e:
-                await self.bot.get_channel(546570094449393665).send('Failed to post server count to <https://discordbots.org>\n{}: {}'.format(type(e).__name__, e))
-            await asyncio.sleep(1800)
+            #try:
+                url= f"https://discordbots.org/api/bots/{self.bot.user.id}/stats"
+                print(url)
+                headers= {"Authorization": self.token}
+                payload= {"server_count": len(self.bot.guilds)}
+                
+                async with session.post(url, data= payload, headers= headers) as resp:
+                    print(await resp.text())
+            #except Exception as e:
+            #    await self.bot.get_channel(546570094449393665).send('Failed to post server count to <https://discordbots.org>\n{}: {}'.format(type(e).__name__, e))
+                await asyncio.sleep(1800)
 
 # Update user info
 async def setup_info(bot):
