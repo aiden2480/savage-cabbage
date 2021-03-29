@@ -1,7 +1,7 @@
 # Bot
 pyfiglet
 praw==6.1.1
-pillow==5.4.1
+pillow==8.1.1
 asyncio==3.4.3
 humanize==0.5.1
 json-store-client==1.0.1
